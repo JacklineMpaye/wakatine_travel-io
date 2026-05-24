@@ -152,5 +152,30 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
   }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    letter-spacing: -0.02em;
+  }
+}
+
+@layer utilities {
+  .gradient-text {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .glass {
+    background: var(--gradient-card);
+    backdrop-filter: blur(20px);
+    border: 1px solid oklch(1 0 0 / 0.5);
+  }
+  .shadow-elegant { box-shadow: var(--shadow-elegant); }
+  .shadow-glow { box-shadow: var(--shadow-glow); }
+  .bg-gradient-primary { background: var(--gradient-primary); }
+  .bg-gradient-hero { background: var(--gradient-hero); }
 }

@@ -20,7 +20,7 @@ const schema = z.object({
 });
 
 export const Route = createFileRoute("/contact")({
-  head: () => ({ meta: [{ title: "Contact Us — PearlBridge" }, { name: "description", content: "Get in touch with PearlBridge in Kampala." }] }),
+  head: () => ({ meta: [{ title: "Contact Us — Wakatine" }, { name: "description", content: "Get in touch with Wakatine in Kampala." }] }),
   component: Contact,
 });
 
@@ -43,7 +43,7 @@ function Contact() {
       <section className="bg-gradient-hero text-white py-16"><div className="container mx-auto px-4"><h1 className="text-4xl md:text-5xl font-bold mb-3">Get in Touch</h1><p className="text-white/85">We reply within one business day.</p></div></section>
       <section className="container mx-auto px-4 py-12 grid md:grid-cols-3 gap-8">
         <div className="space-y-4">
-          {[{i:MapPin,t:"Visit",d:"Plot 24, Kampala Road, Kampala"},{i:Phone,t:"Call",d:"+256 700 000 000"},{i:Mail,t:"Email",d:"info@pearlbridge.ug"}].map((c)=>(
+          {[{i:MapPin,t:"Visit",d:"Plot 24, Kampala Road, Kampala"},{i:Phone,t:"Call",d:"+256 700 000 000"},{i:Mail,t:"Email",d:"info@wakatine.ug"}].map((c)=>(
             <Card key={c.t} className="p-5 flex gap-4"><c.i className="w-6 h-6 text-primary shrink-0"/><div><div className="font-semibold">{c.t}</div><div className="text-sm text-muted-foreground">{c.d}</div></div></Card>
           ))}
         </div>

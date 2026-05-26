@@ -3,14 +3,13 @@ import { Link } from "@tanstack/react-router";
 import { PublicLayout } from "@/components/site/PublicLayout";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { COUNTRIES } from "@/lib/countries";
-import { Plane, ShieldCheck, Users, CheckCircle2, ArrowRight, Star } from "lucide-react";
+import { Plane, ShieldCheck, Users, CheckCircle2, ArrowRight, Star, MessageCircle } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "PearlBridge — Get Jobs Abroad from Uganda" },
-      { name: "description", content: "Licensed Ugandan recruitment agency. Apply for verified jobs in UAE, Qatar, Saudi Arabia, UK, Canada, and USA." },
+      { title: "Wakatine — UAE Jobs for Ugandans" },
+      { name: "description", content: "Licensed Ugandan recruitment agency placing workers in the United Arab Emirates. Apply online from your phone." },
     ],
   }),
   component: Index,
@@ -29,17 +28,17 @@ function Index() {
               <ShieldCheck className="w-4 h-4" /> Licensed by Uganda Ministry of Gender, Labour & Social Development
             </div>
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-[1.05] mb-6">
-              Your bridge to a <span className="block bg-clip-text text-transparent" style={{ backgroundImage: "linear-gradient(90deg, #fff, #f8c8ff)" }}>career abroad.</span>
+              Work in the <span className="block bg-clip-text text-transparent" style={{ backgroundImage: "linear-gradient(90deg, #fff, #f8c8ff)" }}>United Arab Emirates 🇦🇪</span>
             </h1>
             <p className="text-lg md:text-xl text-white/85 mb-8 max-w-2xl">
-              Trusted overseas placements for Ugandans in the Gulf, UK, Canada and USA — from application to deployment.
+              Wakatine helps Ugandans get verified jobs in Dubai, Abu Dhabi and Sharjah — from application to deployment.
             </p>
             <div className="flex flex-wrap gap-3">
-              <Link to="/jobs"><Button size="lg" className="bg-white text-primary hover:bg-white/90 shadow-elegant">Browse Jobs <ArrowRight className="w-4 h-4 ml-2" /></Button></Link>
-              <Link to="/signup"><Button size="lg" variant="outline" className="border-white/40 bg-white/10 text-white hover:bg-white/20">Start Application</Button></Link>
+              <Link to="/apply"><Button size="lg" className="bg-white text-primary hover:bg-white/90 shadow-elegant">Apply Now <ArrowRight className="w-4 h-4 ml-2" /></Button></Link>
+              <Link to="/jobs"><Button size="lg" variant="outline" className="border-white/40 bg-white/10 text-white hover:bg-white/20">Browse UAE Jobs</Button></Link>
             </div>
             <div className="mt-12 grid grid-cols-3 gap-6 max-w-xl">
-              {[{ n: "5,200+", l: "Deployed" }, { n: "12", l: "Countries" }, { n: "98%", l: "Visa Success" }].map((s) => (
+              {[{ n: "5,200+", l: "Deployed to UAE" }, { n: "20+", l: "Job Types" }, { n: "98%", l: "Visa Success" }].map((s) => (
                 <div key={s.l}>
                   <div className="text-3xl md:text-4xl font-bold">{s.n}</div>
                   <div className="text-sm text-white/70">{s.l}</div>
@@ -50,22 +49,24 @@ function Index() {
         </div>
       </section>
 
-      {/* COUNTRIES */}
+      {/* JOBS GRID */}
       <section className="container mx-auto px-4 py-20">
         <div className="flex items-end justify-between mb-10 flex-wrap gap-4">
           <div>
-            <h2 className="text-3xl md:text-4xl font-bold mb-2">Where Ugandans are working</h2>
-            <p className="text-muted-foreground">Verified employers across 6 high-demand destinations.</p>
+            <h2 className="text-3xl md:text-4xl font-bold mb-2">Popular UAE jobs</h2>
+            <p className="text-muted-foreground">High-demand roles for Ugandan workers in the UAE.</p>
           </div>
-          <Link to="/countries"><Button variant="ghost">View all <ArrowRight className="w-4 h-4 ml-1" /></Button></Link>
+          <Link to="/jobs"><Button variant="ghost">View all <ArrowRight className="w-4 h-4 ml-1" /></Button></Link>
         </div>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {COUNTRIES.map((c) => (
-            <Card key={c.code} className="p-6 hover:shadow-elegant transition-all hover:-translate-y-1 cursor-pointer group">
-              <div className="text-5xl mb-3">{c.flag}</div>
-              <h3 className="text-xl font-bold mb-1 group-hover:text-primary transition-colors">{c.name}</h3>
-              <p className="text-sm text-muted-foreground mb-3">{c.blurb}</p>
-              <div className="text-sm font-medium text-primary">{c.averageSalary}</div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          {[
+            "Cleaner","Security Guard","Driver","House Maid","Hotel Attendant",
+            "Waiter/Waitress","Kitchen Helper","Construction Worker","Caregiver","Salon Worker","Packing Worker","Office Cleaner",
+          ].map((j) => (
+            <Card key={j} className="p-5 hover:shadow-elegant transition-all hover:-translate-y-1 cursor-pointer group">
+              <div className="text-3xl mb-2">💼</div>
+              <h3 className="font-bold group-hover:text-primary transition-colors">{j}</h3>
+              <div className="text-xs text-muted-foreground mt-1">AED 1,200 – 3,500/mo</div>
             </Card>
           ))}
         </div>

@@ -14,6 +14,90 @@ export type Database = {
   }
   public: {
     Tables: {
+      application_details: {
+        Row: {
+          created_at: string
+          date_of_birth: string | null
+          desired_job: string | null
+          district: string | null
+          email: string | null
+          father_status: string | null
+          full_name: string | null
+          gender: string | null
+          has_passport: boolean | null
+          id: string
+          mother_status: string | null
+          nationality: string | null
+          next_of_kin_name: string | null
+          next_of_kin_phone: string | null
+          next_of_kin_relationship: string | null
+          nin: string | null
+          nin_issue: string | null
+          passport_number: string | null
+          passport_photo_path: string | null
+          phone: string | null
+          salary_expectation_ugx: number | null
+          submitted: boolean
+          updated_at: string
+          user_id: string
+          village: string | null
+        }
+        Insert: {
+          created_at?: string
+          date_of_birth?: string | null
+          desired_job?: string | null
+          district?: string | null
+          email?: string | null
+          father_status?: string | null
+          full_name?: string | null
+          gender?: string | null
+          has_passport?: boolean | null
+          id?: string
+          mother_status?: string | null
+          nationality?: string | null
+          next_of_kin_name?: string | null
+          next_of_kin_phone?: string | null
+          next_of_kin_relationship?: string | null
+          nin?: string | null
+          nin_issue?: string | null
+          passport_number?: string | null
+          passport_photo_path?: string | null
+          phone?: string | null
+          salary_expectation_ugx?: number | null
+          submitted?: boolean
+          updated_at?: string
+          user_id: string
+          village?: string | null
+        }
+        Update: {
+          created_at?: string
+          date_of_birth?: string | null
+          desired_job?: string | null
+          district?: string | null
+          email?: string | null
+          father_status?: string | null
+          full_name?: string | null
+          gender?: string | null
+          has_passport?: boolean | null
+          id?: string
+          mother_status?: string | null
+          nationality?: string | null
+          next_of_kin_name?: string | null
+          next_of_kin_phone?: string | null
+          next_of_kin_relationship?: string | null
+          nin?: string | null
+          nin_issue?: string | null
+          passport_number?: string | null
+          passport_photo_path?: string | null
+          phone?: string | null
+          salary_expectation_ugx?: number | null
+          submitted?: boolean
+          updated_at?: string
+          user_id?: string
+          village?: string | null
+        }
+        Relationships: []
+      }
       application_status_history: {
         Row: {
           application_id: string
@@ -256,6 +340,7 @@ export type Database = {
           id: string
           method: string | null
           notes: string | null
+          payment_type: Database["public"]["Enums"]["payment_type"]
           receipt_url: string | null
           reference: string | null
           status: Database["public"]["Enums"]["payment_status"]
@@ -270,6 +355,7 @@ export type Database = {
           id?: string
           method?: string | null
           notes?: string | null
+          payment_type?: Database["public"]["Enums"]["payment_type"]
           receipt_url?: string | null
           reference?: string | null
           status?: Database["public"]["Enums"]["payment_status"]
@@ -284,6 +370,7 @@ export type Database = {
           id?: string
           method?: string | null
           notes?: string | null
+          payment_type?: Database["public"]["Enums"]["payment_type"]
           receipt_url?: string | null
           reference?: string | null
           status?: Database["public"]["Enums"]["payment_status"]
@@ -437,6 +524,11 @@ export type Database = {
         | "medical"
       employment_type: "full_time" | "part_time" | "contract" | "temporary"
       payment_status: "pending" | "partial" | "paid" | "overdue" | "verified"
+      payment_type:
+        | "passport_processing"
+        | "nin_assistance"
+        | "recruitment_processing"
+        | "other"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -588,6 +680,12 @@ export const Constants = {
       ],
       employment_type: ["full_time", "part_time", "contract", "temporary"],
       payment_status: ["pending", "partial", "paid", "overdue", "verified"],
+      payment_type: [
+        "passport_processing",
+        "nin_assistance",
+        "recruitment_processing",
+        "other",
+      ],
     },
   },
 } as const

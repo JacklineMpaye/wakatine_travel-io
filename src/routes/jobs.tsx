@@ -51,7 +51,7 @@ function JobsPage() {
                     <span className="flex items-center gap-1"><MapPin className="w-4 h-4"/>{j.city?`${j.city}, `:""}{j.country}</span>
                     {j.salary_min && <span className="flex items-center gap-1"><DollarSign className="w-4 h-4"/>{j.currency} {j.salary_min}{j.salary_max?` - ${j.salary_max}`:""}</span>}
                     {j.deadline && <span className="flex items-center gap-1"><Calendar className="w-4 h-4"/>{new Date(j.deadline).toLocaleDateString()}</span>}
-                    <Badge variant="secondary">{j.employment_type.replace("_"," ")}</Badge>
+                    <Badge variant="secondary">{(j.employment_type ?? "full_time").replace("_"," ")}</Badge>
                   </div>
                 </div>
                 <Link to="/jobs/$jobId" params={{ jobId: j.id }}><Button className="bg-gradient-primary">View & Apply</Button></Link>

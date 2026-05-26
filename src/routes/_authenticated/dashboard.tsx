@@ -71,10 +71,10 @@ function Dashboard() {
       <Card className="p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-bold text-lg">Your applications</h2>
-          <Link to="/jobs"><Button size="sm" className="bg-gradient-primary">Find more jobs</Button></Link>
+          <Link to="/apply"><Button size="sm" className="bg-gradient-primary">Continue Application</Button></Link>
         </div>
         {(data?.apps.length ?? 0) === 0 ? (
-          <div className="text-center py-8 text-muted-foreground"><Briefcase className="w-10 h-10 mx-auto mb-2 opacity-50"/><p>No applications yet. <Link to="/jobs" className="text-primary underline">Browse jobs →</Link></p></div>
+          <div className="text-center py-8 text-muted-foreground"><Briefcase className="w-10 h-10 mx-auto mb-2 opacity-50"/><p>No applications yet. <Link to="/apply" className="text-primary underline">Start your application →</Link></p></div>
         ) : (
           <div className="space-y-3">{data!.apps.map((a: any) => (
             <div key={a.id} className="flex justify-between items-center p-3 rounded-lg border border-border hover:bg-muted/40">

@@ -24,7 +24,7 @@ function Signup() {
     const { error } = await supabase.auth.signUp({
       email: f.email,
       password: f.password,
-      options: { emailRedirectTo: `${window.location.origin}/dashboard`, data: { full_name: f.full_name, phone: f.phone } },
+      options: { emailRedirectTo: `${window.location.origin}/apply`, data: { full_name: f.full_name, phone: f.phone } },
     });
     setLoading(false);
     if (error) return toast.error(error.message);

@@ -6,10 +6,10 @@ import { useAuth } from "@/hooks/use-auth";
 
 const links = [
   { to: "/", label: "Home" },
-  { to: "/jobs", label: "Jobs" },
-  { to: "/countries", label: "Countries" },
+  { to: "/jobs", label: "UAE Jobs" },
+  { to: "/how-it-works", label: "How It Works" },
   { to: "/about", label: "About" },
-  { to: "/testimonials", label: "Stories" },
+  { to: "/faq", label: "FAQ" },
   { to: "/contact", label: "Contact" },
 ];
 
@@ -24,7 +24,7 @@ export function Navbar() {
           <div className="w-9 h-9 rounded-xl flex items-center justify-center text-primary-foreground" style={{ background: "var(--gradient-primary)" }}>
             <Briefcase className="w-5 h-5" />
           </div>
-          <span>Pearl<span className="text-primary">Bridge</span></span>
+          <span>Waka<span className="text-primary">tine</span></span>
         </Link>
 
         <nav className="hidden md:flex items-center gap-1">

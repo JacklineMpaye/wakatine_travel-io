@@ -45,7 +45,7 @@ function JobDetail() {
         <Card className="p-8">
           <div className="flex items-start justify-between flex-wrap gap-4 mb-4">
             <div><h1 className="text-3xl font-bold mb-2">{job.title}</h1><div className="text-muted-foreground">{job.employer ?? "Verified Employer"}</div></div>
-            <Badge className="bg-gradient-primary text-primary-foreground">{job.employment_type.replace("_"," ")}</Badge>
+            <Badge className="bg-gradient-primary text-primary-foreground">{(job.employment_type ?? "full_time").replace("_"," ")}</Badge>
           </div>
           <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mb-6">
             <span className="flex items-center gap-1"><MapPin className="w-4 h-4"/>{job.city?`${job.city}, `:""}{job.country}</span>

@@ -10,7 +10,7 @@ export function PublicLayout({ children }: { children: ReactNode }) {
       <main className="flex-1">{children}</main>
       <Footer />
       <a
-        href="https://wa.me/256700000000"
+        href="https://wa.me/256789431312"
         target="_blank"
         rel="noreferrer"
         aria-label="WhatsApp us"

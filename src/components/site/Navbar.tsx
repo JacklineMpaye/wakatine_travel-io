@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Menu, X, Briefcase } from "lucide-react";
+import { Menu, X, Plane } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -21,10 +21,13 @@ export function Navbar() {
     <header className="sticky top-0 z-50 backdrop-blur-xl bg-background/70 border-b border-border/60">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2 font-bold text-lg">
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center text-primary-foreground" style={{ background: "var(--gradient-primary)" }}>
-            <Briefcase className="w-5 h-5" />
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-elegant" style={{ background: "var(--gradient-primary)" }}>
+            <Plane className="w-5 h-5 text-gold" />
           </div>
-          <span>Waka<span className="text-primary">tine</span></span>
+          <div className="leading-tight">
+            <div className="text-base">Waka<span className="text-gold">tine</span></div>
+            <div className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium">Tours & Travel</div>
+          </div>
         </Link>
 
         <nav className="hidden md:flex items-center gap-1">

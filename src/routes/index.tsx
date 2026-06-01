@@ -8,8 +8,8 @@ import { Plane, ShieldCheck, Users, CheckCircle2, ArrowRight, Star, MessageCircl
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Wakatine — UAE Jobs for Ugandans" },
-      { name: "description", content: "Licensed Ugandan recruitment agency placing workers in the United Arab Emirates. Apply online from your phone." },
+      { title: "Wakatine Tours & Travel — Go Global with Wakatine" },
+      { name: "description", content: "Licensed Ugandan recruitment & travel agency placing workers in the United Arab Emirates. Apply online from your phone." },
     ],
   }),
   component: Index,
@@ -28,13 +28,13 @@ function Index() {
               <ShieldCheck className="w-4 h-4" /> Licensed by Uganda Ministry of Gender, Labour & Social Development
             </div>
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-[1.05] mb-6">
-              Work in the <span className="block bg-clip-text text-transparent" style={{ backgroundImage: "linear-gradient(90deg, #fff, #f8c8ff)" }}>United Arab Emirates 🇦🇪</span>
+              Go Global with <span className="block bg-clip-text text-transparent bg-gradient-gold">Wakatine ✈️</span>
             </h1>
             <p className="text-lg md:text-xl text-white/85 mb-8 max-w-2xl">
-              Wakatine helps Ugandans get verified jobs in Dubai, Abu Dhabi and Sharjah — from application to deployment.
+              Wakatine Tours & Travel helps Ugandans get verified jobs in Dubai, Abu Dhabi and Sharjah — from application to deployment.
             </p>
             <div className="flex flex-wrap gap-3">
-              <Link to="/apply"><Button size="lg" className="bg-white text-primary hover:bg-white/90 shadow-elegant">Apply Now <ArrowRight className="w-4 h-4 ml-2" /></Button></Link>
+              <Link to="/apply"><Button size="lg" className="bg-gold hover:opacity-90 shadow-elegant">Apply Now <ArrowRight className="w-4 h-4 ml-2" /></Button></Link>
               <Link to="/jobs"><Button size="lg" variant="outline" className="border-white/40 bg-white/10 text-white hover:bg-white/20">Browse UAE Jobs</Button></Link>
             </div>
             <div className="mt-12 grid grid-cols-3 gap-6 max-w-xl">

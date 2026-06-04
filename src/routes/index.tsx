@@ -34,7 +34,7 @@ function Index() {
               Wakatine Tours & Travel helps Ugandans get verified jobs in Dubai, Abu Dhabi and Sharjah — from application to deployment.
             </p>
             <div className="flex flex-wrap gap-3">
-              <Link to="/apply"><Button size="lg" className="bg-gold hover:opacity-90 shadow-elegant">Apply Now <ArrowRight className="w-4 h-4 ml-2" /></Button></Link>
+              <Link to="/my-application"><Button size="lg" className="bg-gold hover:opacity-90 shadow-elegant">Apply Now <ArrowRight className="w-4 h-4 ml-2" /></Button></Link>
               <Link to="/jobs"><Button size="lg" variant="outline" className="border-white/40 bg-white/10 text-white hover:bg-white/20">Browse UAE Jobs</Button></Link>
             </div>
             <div className="mt-12 grid grid-cols-3 gap-6 max-w-xl">

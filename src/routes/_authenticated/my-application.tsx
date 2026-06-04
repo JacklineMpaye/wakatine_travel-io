@@ -9,9 +9,19 @@ import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { ChevronLeft, ChevronRight, CheckCircle2, AlertTriangle, Upload } from "lucide-react";
+import { ChevronLeft, ChevronRight, CheckCircle2, AlertTriangle, Upload, Circle, Clock, Pencil } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/my-application")({ component: Apply });
+export const Route = createFileRoute("/_authenticated/my-application")({ component: MyApplication });
+
+const STAGES = [
+  "registration_submitted","documents_pending","documents_verified","interview_scheduled",
+  "interview_passed","medical_check_pending","visa_processing","visa_approved","flight_scheduled","deployed_abroad",
+];
+const STAGE_LABEL: Record<string,string> = {
+  registration_submitted:"Registration Submitted", documents_pending:"Documents Pending", documents_verified:"Documents Verified",
+  interview_scheduled:"Interview Scheduled", interview_passed:"Interview Passed", medical_check_pending:"Medical Check",
+  visa_processing:"Visa Processing", visa_approved:"Visa Approved", flight_scheduled:"Flight Scheduled", deployed_abroad:"Deployed Abroad",
+};
 
 const UAE_JOBS = [
   "Cleaner","Security Guard","Driver","House Maid","Hotel Attendant","Waiter/Waitress",

@@ -3,14 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Users, Briefcase, FileText, CreditCard, ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/admin/")({ component: AdminHome });
-
-const STATUSES = [
-  "registration_submitted","documents_pending","documents_verified","interview_scheduled",
-  "interview_passed","medical_check_pending","visa_processing","visa_approved","flight_scheduled","deployed_abroad","rejected",
-];
 
 function AdminHome() {
   const { data: stats } = useQuery({

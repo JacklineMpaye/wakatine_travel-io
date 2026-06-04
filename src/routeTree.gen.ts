@@ -29,8 +29,6 @@ import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authen
 import { Route as AuthenticatedMyApplicationRouteImport } from './routes/_authenticated/my-application'
 import { Route as AuthenticatedDocumentsRouteImport } from './routes/_authenticated/documents'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
-import { Route as AuthenticatedApplyRouteImport } from './routes/_authenticated/apply'
-import { Route as AuthenticatedApplicationsRouteImport } from './routes/_authenticated/applications'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 
@@ -135,17 +133,6 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedApplyRoute = AuthenticatedApplyRouteImport.update({
-  id: '/apply',
-  path: '/apply',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedApplicationsRoute =
-  AuthenticatedApplicationsRouteImport.update({
-    id: '/applications',
-    path: '/applications',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -171,8 +158,6 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/testimonials': typeof TestimonialsRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
-  '/applications': typeof AuthenticatedApplicationsRoute
-  '/apply': typeof AuthenticatedApplyRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/documents': typeof AuthenticatedDocumentsRoute
   '/my-application': typeof AuthenticatedMyApplicationRoute
@@ -195,8 +180,6 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/testimonials': typeof TestimonialsRoute
-  '/applications': typeof AuthenticatedApplicationsRoute
-  '/apply': typeof AuthenticatedApplyRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/documents': typeof AuthenticatedDocumentsRoute
   '/my-application': typeof AuthenticatedMyApplicationRoute
@@ -222,8 +205,6 @@ export interface FileRoutesById {
   '/signup': typeof SignupRoute
   '/testimonials': typeof TestimonialsRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
-  '/_authenticated/applications': typeof AuthenticatedApplicationsRoute
-  '/_authenticated/apply': typeof AuthenticatedApplyRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/documents': typeof AuthenticatedDocumentsRoute
   '/_authenticated/my-application': typeof AuthenticatedMyApplicationRoute
@@ -249,8 +230,6 @@ export interface FileRouteTypes {
     | '/signup'
     | '/testimonials'
     | '/admin'
-    | '/applications'
-    | '/apply'
     | '/dashboard'
     | '/documents'
     | '/my-application'
@@ -273,8 +252,6 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/signup'
     | '/testimonials'
-    | '/applications'
-    | '/apply'
     | '/dashboard'
     | '/documents'
     | '/my-application'
@@ -299,8 +276,6 @@ export interface FileRouteTypes {
     | '/signup'
     | '/testimonials'
     | '/_authenticated/admin'
-    | '/_authenticated/applications'
-    | '/_authenticated/apply'
     | '/_authenticated/dashboard'
     | '/_authenticated/documents'
     | '/_authenticated/my-application'
@@ -469,20 +444,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/apply': {
-      id: '/_authenticated/apply'
-      path: '/apply'
-      fullPath: '/apply'
-      preLoaderRoute: typeof AuthenticatedApplyRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/applications': {
-      id: '/_authenticated/applications'
-      path: '/applications'
-      fullPath: '/applications'
-      preLoaderRoute: typeof AuthenticatedApplicationsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/admin': {
       id: '/_authenticated/admin'
       path: '/admin'
@@ -513,8 +474,6 @@ const AuthenticatedAdminRouteWithChildren =
 
 interface AuthenticatedRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
-  AuthenticatedApplicationsRoute: typeof AuthenticatedApplicationsRoute
-  AuthenticatedApplyRoute: typeof AuthenticatedApplyRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDocumentsRoute: typeof AuthenticatedDocumentsRoute
   AuthenticatedMyApplicationRoute: typeof AuthenticatedMyApplicationRoute
@@ -525,8 +484,6 @@ interface AuthenticatedRouteChildren {
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
-  AuthenticatedApplicationsRoute: AuthenticatedApplicationsRoute,
-  AuthenticatedApplyRoute: AuthenticatedApplyRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDocumentsRoute: AuthenticatedDocumentsRoute,
   AuthenticatedMyApplicationRoute: AuthenticatedMyApplicationRoute,
@@ -567,3 +524,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

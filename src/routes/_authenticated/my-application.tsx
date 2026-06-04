@@ -184,18 +184,64 @@ function MyApplication() {
     });
 
     setLoading(false);
+    setSubmitted(true);
+    setEditing(false);
     toast.success("Application submitted!");
-    nav({ to: "/dashboard" });
   };
 
   const pct = Math.round(((step + 1) / STEPS.length) * 100);
   const requiresPassportFee = f.has_passport === "no";
   const requiresNinFee = f.nin_issue && f.nin_issue !== "no_issues";
 
+  if (submitted && !editing) {
+    const status = tracker?.status ?? "registration_submitted";
+    const idx = STAGES.indexOf(status);
+    return (
+      <div className="max-w-3xl mx-auto space-y-6">
+        <div className="flex items-start justify-between flex-wrap gap-3">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold">My Application</h1>
+            <p className="text-muted-foreground text-sm">Wakatine UAE Recruitment</p>
+          </div>
+          <Button variant="outline" size="sm" onClick={() => { setEditing(true); setStep(0); }}><Pencil className="w-4 h-4 mr-1"/>Edit details</Button>
+        </div>
+        <Card className="p-6">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="font-bold text-lg">Application progress</h2>
+            <Badge className="bg-gradient-primary text-primary-foreground">{STAGE_LABEL[status] ?? status}</Badge>
+          </div>
+          <div className="space-y-1">
+            {STAGES.map((s, i) => {
+              const done = i < idx, current = i === idx;
+              return (
+                <div key={s} className={`flex items-center gap-3 py-1.5 ${done?"text-success":current?"text-primary font-medium":"text-muted-foreground"}`}>
+                  {done ? <CheckCircle2 className="w-4 h-4"/> : current ? <Clock className="w-4 h-4 animate-pulse"/> : <Circle className="w-4 h-4"/>}
+                  <span className="text-sm">{STAGE_LABEL[s]}</span>
+                </div>
+              );
+            })}
+          </div>
+          {tracker?.admin_notes && <div className="mt-4 p-3 bg-muted rounded-lg text-sm"><span className="font-medium">Admin notes:</span> {tracker.admin_notes}</div>}
+        </Card>
+        <Card className="p-6 space-y-2">
+          <h2 className="font-bold text-lg mb-2">Submitted details</h2>
+          <Review label="Full Name" v={f.full_name}/>
+          <Review label="Phone" v={f.phone}/>
+          <Review label="NIN" v={f.nin}/>
+          <Review label="District / Village" v={`${f.district}${f.village ? ` · ${f.village}` : ""}`}/>
+          <Review label="Next of Kin" v={`${f.next_of_kin_name} (${f.next_of_kin_relationship}) — ${f.next_of_kin_phone}`}/>
+          <Review label="Passport" v={f.has_passport === "yes" ? `Yes — ${f.passport_number}` : "No (processing required)"}/>
+          <Review label="Desired Job" v={f.desired_job}/>
+          <Review label="Salary expectation" v={f.salary_expectation_ugx ? `UGX ${Number(f.salary_expectation_ugx).toLocaleString()}` : "—"}/>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl md:text-3xl font-bold">UAE Job Application</h1>
+        <h1 className="text-2xl md:text-3xl font-bold">{editing ? "Edit Application" : "Start Your Application"}</h1>
         <p className="text-muted-foreground text-sm">Step {step + 1} of {STEPS.length} — {STEPS[step]}</p>
       </div>
       <Progress value={pct} className="h-2"/>

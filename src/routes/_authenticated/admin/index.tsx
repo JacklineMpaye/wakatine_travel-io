@@ -66,7 +66,6 @@ function AdminHome() {
           </Link>
         ))}
       </div>
-      <div className="hidden"><Button>noop</Button></div>
     </div>
   );
 }

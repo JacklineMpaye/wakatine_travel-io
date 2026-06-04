@@ -77,6 +77,7 @@ function MyApplication() {
       const { data } = await supabase.from("application_details").select("*").eq("user_id", user.id).maybeSingle();
       if (data) {
         setSavedId(data.id);
+        setSubmitted(Boolean((data as any).submitted));
         setF((prev) => ({
           ...prev,
           full_name: data.full_name ?? "", date_of_birth: data.date_of_birth ?? "", gender: data.gender ?? "",
@@ -91,6 +92,8 @@ function MyApplication() {
           nin_issue: data.nin_issue ?? "no_issues",
         }));
       }
+      const { data: app } = await supabase.from("applications").select("status, admin_notes").eq("applicant_id", user.id).order("created_at", { ascending: false }).limit(1).maybeSingle();
+      if (app) setTracker({ status: app.status as string, admin_notes: (app.admin_notes as string | null) ?? null });
     })();
   }, [user]);
 

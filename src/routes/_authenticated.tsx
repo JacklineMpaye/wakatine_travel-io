@@ -1,15 +1,14 @@
 import { createFileRoute, Outlet, Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
 import { useEffect } from "react";
-import { LayoutDashboard, FileText, FolderOpen, CreditCard, Bell, User, LogOut, Briefcase, ShieldCheck, ClipboardList } from "lucide-react";
+import { LayoutDashboard, FolderOpen, CreditCard, Bell, User, LogOut, Plane, ClipboardCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated")({ component: AuthLayout });
 
 const navItems = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/apply", label: "Apply", icon: ClipboardList },
-  { to: "/applications", label: "Applications", icon: FileText },
+  { to: "/my-application", label: "My Application", icon: ClipboardCheck },
   { to: "/documents", label: "Documents", icon: FolderOpen },
   { to: "/payments", label: "Payments", icon: CreditCard },
   { to: "/notifications", label: "Notifications", icon: Bell },
@@ -20,15 +19,31 @@ function AuthLayout() {
   const { user, loading, isAdmin, signOut } = useAuth();
   const nav = useNavigate();
   const path = useRouterState({ select: (s) => s.location.pathname });
-  useEffect(() => { if (!loading && !user) nav({ to: "/login" }); }, [user, loading, nav]);
+
+  useEffect(() => {
+    if (loading) return;
+    if (!user) { nav({ to: "/login" }); return; }
+    // Admins are not allowed in the applicant portal
+    if (isAdmin && !path.startsWith("/admin")) nav({ to: "/admin" });
+  }, [user, loading, isAdmin, nav, path]);
+
   if (loading || !user) return <div className="min-h-screen flex items-center justify-center">Loading…</div>;
+  // While redirecting admins, render nothing under applicant layout
+  if (isAdmin && !path.startsWith("/admin")) return null;
+  // Admin section uses its own layout
+  if (path.startsWith("/admin")) return <Outlet />;
+
   return (
     <div className="min-h-screen flex bg-secondary/30">
       <aside className="hidden md:flex flex-col w-64 bg-card border-r border-border p-4">
-        <Link to="/" className="flex items-center gap-2 font-bold text-lg mb-8">
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center text-primary-foreground bg-gradient-primary"><Briefcase className="w-5 h-5"/></div>
-          Wakatine
+        <Link to="/" className="flex items-center gap-2 font-bold text-lg mb-2">
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center shadow-elegant" style={{ background: "var(--gradient-primary)" }}><Plane className="w-5 h-5 text-gold"/></div>
+          <div className="leading-tight">
+            <div>Waka<span className="text-gold">tine</span></div>
+            <div className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium">Applicant Portal</div>
+          </div>
         </Link>
+        <div className="text-xs text-muted-foreground mb-6 px-1">Signed in as Applicant</div>
         <nav className="flex-1 space-y-1">
           {navItems.map((i) => {
             const active = path === i.to;
@@ -38,17 +53,11 @@ function AuthLayout() {
               </Link>
             );
           })}
-          {isAdmin && (
-            <Link to="/admin" className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${path.startsWith("/admin") ? "bg-gradient-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"}`}>
-              <ShieldCheck className="w-4 h-4"/>Admin
-            </Link>
-          )}
         </nav>
         <Button variant="ghost" onClick={async () => { await signOut(); nav({ to: "/" }); }} className="justify-start"><LogOut className="w-4 h-4 mr-2"/>Sign out</Button>
       </aside>
       <main className="flex-1 overflow-x-hidden">
         <div className="p-4 md:p-6 pb-24 md:pb-6"><Outlet/></div>
-        {/* Mobile bottom nav */}
         <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-card/95 backdrop-blur border-t border-border flex justify-around py-1.5 safe-bottom">
           {navItems.slice(0,5).map((i) => {
             const active = path === i.to;

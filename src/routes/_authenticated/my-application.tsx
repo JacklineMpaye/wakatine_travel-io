@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -53,7 +53,6 @@ const STEPS = ["Personal", "Family", "Documents", "Job", "Review"];
 
 function MyApplication() {
   const { user } = useAuth();
-  const nav = useNavigate();
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [savedId, setSavedId] = useState<string | null>(null);

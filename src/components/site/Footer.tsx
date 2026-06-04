@@ -38,7 +38,7 @@ export function Footer() {
           <h4 className="font-semibold mb-3">Support</h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li><Link to="/contact" className="hover:text-primary">Contact Us</Link></li>
-            <li><Link to="/apply" className="hover:text-primary">Apply Now</Link></li>
+            <li><Link to="/signup" className="hover:text-primary">Apply Now</Link></li>
             <li><Link to="/login" className="hover:text-primary">Applicant Login</Link></li>
           </ul>
         </div>

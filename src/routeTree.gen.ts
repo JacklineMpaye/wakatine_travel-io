@@ -26,12 +26,19 @@ import { Route as JobsJobIdRouteImport } from './routes/jobs.$jobId'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedPaymentsRouteImport } from './routes/_authenticated/payments'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
+import { Route as AuthenticatedMyApplicationRouteImport } from './routes/_authenticated/my-application'
 import { Route as AuthenticatedDocumentsRouteImport } from './routes/_authenticated/documents'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
-import { Route as AuthenticatedApplyRouteImport } from './routes/_authenticated/apply'
-import { Route as AuthenticatedApplicationsRouteImport } from './routes/_authenticated/applications'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
+import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin/settings'
+import { Route as AuthenticatedAdminReportsRouteImport } from './routes/_authenticated/admin/reports'
+import { Route as AuthenticatedAdminReceiptsRouteImport } from './routes/_authenticated/admin/receipts'
+import { Route as AuthenticatedAdminPaymentsRouteImport } from './routes/_authenticated/admin/payments'
+import { Route as AuthenticatedAdminNotificationsRouteImport } from './routes/_authenticated/admin/notifications'
+import { Route as AuthenticatedAdminJobsRouteImport } from './routes/_authenticated/admin/jobs'
+import { Route as AuthenticatedAdminApplicationsRouteImport } from './routes/_authenticated/admin/applications'
+import { Route as AuthenticatedAdminApplicantsRouteImport } from './routes/_authenticated/admin/applicants'
 
 const TestimonialsRoute = TestimonialsRouteImport.update({
   id: '/testimonials',
@@ -118,6 +125,12 @@ const AuthenticatedNotificationsRoute =
     path: '/notifications',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedMyApplicationRoute =
+  AuthenticatedMyApplicationRouteImport.update({
+    id: '/my-application',
+    path: '/my-application',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDocumentsRoute = AuthenticatedDocumentsRouteImport.update({
   id: '/documents',
   path: '/documents',
@@ -128,17 +141,6 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedApplyRoute = AuthenticatedApplyRouteImport.update({
-  id: '/apply',
-  path: '/apply',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedApplicationsRoute =
-  AuthenticatedApplicationsRouteImport.update({
-    id: '/applications',
-    path: '/applications',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -149,6 +151,53 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminSettingsRoute =
+  AuthenticatedAdminSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminReportsRoute =
+  AuthenticatedAdminReportsRouteImport.update({
+    id: '/reports',
+    path: '/reports',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminReceiptsRoute =
+  AuthenticatedAdminReceiptsRouteImport.update({
+    id: '/receipts',
+    path: '/receipts',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminPaymentsRoute =
+  AuthenticatedAdminPaymentsRouteImport.update({
+    id: '/payments',
+    path: '/payments',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminNotificationsRoute =
+  AuthenticatedAdminNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminJobsRoute = AuthenticatedAdminJobsRouteImport.update({
+  id: '/jobs',
+  path: '/jobs',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAdminApplicationsRoute =
+  AuthenticatedAdminApplicationsRouteImport.update({
+    id: '/applications',
+    path: '/applications',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminApplicantsRoute =
+  AuthenticatedAdminApplicantsRouteImport.update({
+    id: '/applicants',
+    path: '/applicants',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -164,14 +213,21 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/testimonials': typeof TestimonialsRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
-  '/applications': typeof AuthenticatedApplicationsRoute
-  '/apply': typeof AuthenticatedApplyRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/documents': typeof AuthenticatedDocumentsRoute
+  '/my-application': typeof AuthenticatedMyApplicationRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/payments': typeof AuthenticatedPaymentsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
+  '/admin/applicants': typeof AuthenticatedAdminApplicantsRoute
+  '/admin/applications': typeof AuthenticatedAdminApplicationsRoute
+  '/admin/jobs': typeof AuthenticatedAdminJobsRoute
+  '/admin/notifications': typeof AuthenticatedAdminNotificationsRoute
+  '/admin/payments': typeof AuthenticatedAdminPaymentsRoute
+  '/admin/receipts': typeof AuthenticatedAdminReceiptsRoute
+  '/admin/reports': typeof AuthenticatedAdminReportsRoute
+  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesByTo {
@@ -187,14 +243,21 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/testimonials': typeof TestimonialsRoute
-  '/applications': typeof AuthenticatedApplicationsRoute
-  '/apply': typeof AuthenticatedApplyRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/documents': typeof AuthenticatedDocumentsRoute
+  '/my-application': typeof AuthenticatedMyApplicationRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/payments': typeof AuthenticatedPaymentsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
+  '/admin/applicants': typeof AuthenticatedAdminApplicantsRoute
+  '/admin/applications': typeof AuthenticatedAdminApplicationsRoute
+  '/admin/jobs': typeof AuthenticatedAdminJobsRoute
+  '/admin/notifications': typeof AuthenticatedAdminNotificationsRoute
+  '/admin/payments': typeof AuthenticatedAdminPaymentsRoute
+  '/admin/receipts': typeof AuthenticatedAdminReceiptsRoute
+  '/admin/reports': typeof AuthenticatedAdminReportsRoute
+  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesById {
@@ -213,14 +276,21 @@ export interface FileRoutesById {
   '/signup': typeof SignupRoute
   '/testimonials': typeof TestimonialsRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
-  '/_authenticated/applications': typeof AuthenticatedApplicationsRoute
-  '/_authenticated/apply': typeof AuthenticatedApplyRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/documents': typeof AuthenticatedDocumentsRoute
+  '/_authenticated/my-application': typeof AuthenticatedMyApplicationRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/payments': typeof AuthenticatedPaymentsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
+  '/_authenticated/admin/applicants': typeof AuthenticatedAdminApplicantsRoute
+  '/_authenticated/admin/applications': typeof AuthenticatedAdminApplicationsRoute
+  '/_authenticated/admin/jobs': typeof AuthenticatedAdminJobsRoute
+  '/_authenticated/admin/notifications': typeof AuthenticatedAdminNotificationsRoute
+  '/_authenticated/admin/payments': typeof AuthenticatedAdminPaymentsRoute
+  '/_authenticated/admin/receipts': typeof AuthenticatedAdminReceiptsRoute
+  '/_authenticated/admin/reports': typeof AuthenticatedAdminReportsRoute
+  '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRouteTypes {
@@ -239,14 +309,21 @@ export interface FileRouteTypes {
     | '/signup'
     | '/testimonials'
     | '/admin'
-    | '/applications'
-    | '/apply'
     | '/dashboard'
     | '/documents'
+    | '/my-application'
     | '/notifications'
     | '/payments'
     | '/profile'
     | '/jobs/$jobId'
+    | '/admin/applicants'
+    | '/admin/applications'
+    | '/admin/jobs'
+    | '/admin/notifications'
+    | '/admin/payments'
+    | '/admin/receipts'
+    | '/admin/reports'
+    | '/admin/settings'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -262,14 +339,21 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/signup'
     | '/testimonials'
-    | '/applications'
-    | '/apply'
     | '/dashboard'
     | '/documents'
+    | '/my-application'
     | '/notifications'
     | '/payments'
     | '/profile'
     | '/jobs/$jobId'
+    | '/admin/applicants'
+    | '/admin/applications'
+    | '/admin/jobs'
+    | '/admin/notifications'
+    | '/admin/payments'
+    | '/admin/receipts'
+    | '/admin/reports'
+    | '/admin/settings'
     | '/admin'
   id:
     | '__root__'
@@ -287,14 +371,21 @@ export interface FileRouteTypes {
     | '/signup'
     | '/testimonials'
     | '/_authenticated/admin'
-    | '/_authenticated/applications'
-    | '/_authenticated/apply'
     | '/_authenticated/dashboard'
     | '/_authenticated/documents'
+    | '/_authenticated/my-application'
     | '/_authenticated/notifications'
     | '/_authenticated/payments'
     | '/_authenticated/profile'
     | '/jobs/$jobId'
+    | '/_authenticated/admin/applicants'
+    | '/_authenticated/admin/applications'
+    | '/_authenticated/admin/jobs'
+    | '/_authenticated/admin/notifications'
+    | '/_authenticated/admin/payments'
+    | '/_authenticated/admin/receipts'
+    | '/_authenticated/admin/reports'
+    | '/_authenticated/admin/settings'
     | '/_authenticated/admin/'
   fileRoutesById: FileRoutesById
 }
@@ -435,6 +526,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedNotificationsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/my-application': {
+      id: '/_authenticated/my-application'
+      path: '/my-application'
+      fullPath: '/my-application'
+      preLoaderRoute: typeof AuthenticatedMyApplicationRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/documents': {
       id: '/_authenticated/documents'
       path: '/documents'
@@ -447,20 +545,6 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/apply': {
-      id: '/_authenticated/apply'
-      path: '/apply'
-      fullPath: '/apply'
-      preLoaderRoute: typeof AuthenticatedApplyRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/applications': {
-      id: '/_authenticated/applications'
-      path: '/applications'
-      fullPath: '/applications'
-      preLoaderRoute: typeof AuthenticatedApplicationsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/admin': {
@@ -477,14 +561,86 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/settings': {
+      id: '/_authenticated/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AuthenticatedAdminSettingsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/reports': {
+      id: '/_authenticated/admin/reports'
+      path: '/reports'
+      fullPath: '/admin/reports'
+      preLoaderRoute: typeof AuthenticatedAdminReportsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/receipts': {
+      id: '/_authenticated/admin/receipts'
+      path: '/receipts'
+      fullPath: '/admin/receipts'
+      preLoaderRoute: typeof AuthenticatedAdminReceiptsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/payments': {
+      id: '/_authenticated/admin/payments'
+      path: '/payments'
+      fullPath: '/admin/payments'
+      preLoaderRoute: typeof AuthenticatedAdminPaymentsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/notifications': {
+      id: '/_authenticated/admin/notifications'
+      path: '/notifications'
+      fullPath: '/admin/notifications'
+      preLoaderRoute: typeof AuthenticatedAdminNotificationsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/jobs': {
+      id: '/_authenticated/admin/jobs'
+      path: '/jobs'
+      fullPath: '/admin/jobs'
+      preLoaderRoute: typeof AuthenticatedAdminJobsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/applications': {
+      id: '/_authenticated/admin/applications'
+      path: '/applications'
+      fullPath: '/admin/applications'
+      preLoaderRoute: typeof AuthenticatedAdminApplicationsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/applicants': {
+      id: '/_authenticated/admin/applicants'
+      path: '/applicants'
+      fullPath: '/admin/applicants'
+      preLoaderRoute: typeof AuthenticatedAdminApplicantsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
   }
 }
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminApplicantsRoute: typeof AuthenticatedAdminApplicantsRoute
+  AuthenticatedAdminApplicationsRoute: typeof AuthenticatedAdminApplicationsRoute
+  AuthenticatedAdminJobsRoute: typeof AuthenticatedAdminJobsRoute
+  AuthenticatedAdminNotificationsRoute: typeof AuthenticatedAdminNotificationsRoute
+  AuthenticatedAdminPaymentsRoute: typeof AuthenticatedAdminPaymentsRoute
+  AuthenticatedAdminReceiptsRoute: typeof AuthenticatedAdminReceiptsRoute
+  AuthenticatedAdminReportsRoute: typeof AuthenticatedAdminReportsRoute
+  AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminApplicantsRoute: AuthenticatedAdminApplicantsRoute,
+  AuthenticatedAdminApplicationsRoute: AuthenticatedAdminApplicationsRoute,
+  AuthenticatedAdminJobsRoute: AuthenticatedAdminJobsRoute,
+  AuthenticatedAdminNotificationsRoute: AuthenticatedAdminNotificationsRoute,
+  AuthenticatedAdminPaymentsRoute: AuthenticatedAdminPaymentsRoute,
+  AuthenticatedAdminReceiptsRoute: AuthenticatedAdminReceiptsRoute,
+  AuthenticatedAdminReportsRoute: AuthenticatedAdminReportsRoute,
+  AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
 
@@ -493,10 +649,9 @@ const AuthenticatedAdminRouteWithChildren =
 
 interface AuthenticatedRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
-  AuthenticatedApplicationsRoute: typeof AuthenticatedApplicationsRoute
-  AuthenticatedApplyRoute: typeof AuthenticatedApplyRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDocumentsRoute: typeof AuthenticatedDocumentsRoute
+  AuthenticatedMyApplicationRoute: typeof AuthenticatedMyApplicationRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedPaymentsRoute: typeof AuthenticatedPaymentsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
@@ -504,10 +659,9 @@ interface AuthenticatedRouteChildren {
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
-  AuthenticatedApplicationsRoute: AuthenticatedApplicationsRoute,
-  AuthenticatedApplyRoute: AuthenticatedApplyRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDocumentsRoute: AuthenticatedDocumentsRoute,
+  AuthenticatedMyApplicationRoute: AuthenticatedMyApplicationRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedPaymentsRoute: AuthenticatedPaymentsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
@@ -545,3 +699,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

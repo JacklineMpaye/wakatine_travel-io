@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Briefcase, FolderOpen, CreditCard, Bell, ArrowRight } from "lucide-react";
+import { Briefcase, FolderOpen, CreditCard, Bell, ArrowRight, ClipboardCheck } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({ component: Dashboard });
 
@@ -40,6 +40,7 @@ function Dashboard() {
   return (
     <div className="space-y-6 max-w-6xl">
       <div>
+        <div className="text-xs uppercase tracking-widest text-primary font-semibold mb-1">Applicant Dashboard</div>
         <h1 className="text-3xl font-bold">Welcome back{data?.profile?.full_name ? `, ${data.profile.full_name.split(" ")[0]}` : ""} 👋</h1>
         <p className="text-muted-foreground">Here's your overseas employment journey at a glance.</p>
       </div>
@@ -70,11 +71,11 @@ function Dashboard() {
 
       <Card className="p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-bold text-lg">Your applications</h2>
-          <Link to="/apply"><Button size="sm" className="bg-gradient-primary">Continue Application</Button></Link>
+          <h2 className="font-bold text-lg">Your application</h2>
+          <Link to="/my-application"><Button size="sm" className="bg-gradient-primary"><ClipboardCheck className="w-4 h-4 mr-1"/>Open</Button></Link>
         </div>
         {(data?.apps.length ?? 0) === 0 ? (
-          <div className="text-center py-8 text-muted-foreground"><Briefcase className="w-10 h-10 mx-auto mb-2 opacity-50"/><p>No applications yet. <Link to="/apply" className="text-primary underline">Start your application →</Link></p></div>
+          <div className="text-center py-8 text-muted-foreground"><Briefcase className="w-10 h-10 mx-auto mb-2 opacity-50"/><p>No application yet. <Link to="/my-application" className="text-primary underline">Start your application →</Link></p></div>
         ) : (
           <div className="space-y-3">{data!.apps.map((a: any) => (
             <div key={a.id} className="flex justify-between items-center p-3 rounded-lg border border-border hover:bg-muted/40">

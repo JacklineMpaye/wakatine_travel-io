@@ -39,7 +39,7 @@ function HIW() {
           ))}
         </div>
         <div className="text-center mt-12">
-          <Link to="/apply"><Button size="lg" className="bg-gradient-primary">Start Your Application</Button></Link>
+          <Link to="/my-application"><Button size="lg" className="bg-gradient-primary">Start Your Application</Button></Link>
         </div>
       </section>
     </PublicLayout>

@@ -51,12 +51,15 @@ type Form = {
 
 const STEPS = ["Personal", "Family", "Documents", "Job", "Review"];
 
-function Apply() {
+function MyApplication() {
   const { user } = useAuth();
   const nav = useNavigate();
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [savedId, setSavedId] = useState<string | null>(null);
+  const [submitted, setSubmitted] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [tracker, setTracker] = useState<{ status: string; admin_notes: string | null } | null>(null);
   const [passportFile, setPassportFile] = useState<File | null>(null);
   const [f, setF] = useState<Form>({
     full_name: "", date_of_birth: "", gender: "", phone: "", email: user?.email ?? "",

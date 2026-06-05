@@ -117,6 +117,7 @@ function NewInvoice({ onCreated }: { onCreated: ()=>void }) {
     const status = balance === 0 ? "paid" : paid > 0 ? "partial" : "unpaid";
     const { data: { user } } = await supabase.auth.getUser();
     const { error } = await supabase.from("invoices").insert({
+      invoice_number: "",
       user_id: f.user_id, service: f.service.trim(), amount_due: due, amount_paid: paid, balance,
       status, notes: f.notes || null, created_by: user?.id ?? null,
     });

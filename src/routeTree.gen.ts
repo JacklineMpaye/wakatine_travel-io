@@ -37,6 +37,7 @@ import { Route as AuthenticatedAdminReceiptsRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminPaymentsRouteImport } from './routes/_authenticated/admin/payments'
 import { Route as AuthenticatedAdminNotificationsRouteImport } from './routes/_authenticated/admin/notifications'
 import { Route as AuthenticatedAdminJobsRouteImport } from './routes/_authenticated/admin/jobs'
+import { Route as AuthenticatedAdminInvoicesRouteImport } from './routes/_authenticated/admin/invoices'
 import { Route as AuthenticatedAdminApplicationsRouteImport } from './routes/_authenticated/admin/applications'
 import { Route as AuthenticatedAdminApplicantsRouteImport } from './routes/_authenticated/admin/applicants'
 
@@ -186,6 +187,12 @@ const AuthenticatedAdminJobsRoute = AuthenticatedAdminJobsRouteImport.update({
   path: '/jobs',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminInvoicesRoute =
+  AuthenticatedAdminInvoicesRouteImport.update({
+    id: '/invoices',
+    path: '/invoices',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminApplicationsRoute =
   AuthenticatedAdminApplicationsRouteImport.update({
     id: '/applications',
@@ -222,6 +229,7 @@ export interface FileRoutesByFullPath {
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/admin/applicants': typeof AuthenticatedAdminApplicantsRoute
   '/admin/applications': typeof AuthenticatedAdminApplicationsRoute
+  '/admin/invoices': typeof AuthenticatedAdminInvoicesRoute
   '/admin/jobs': typeof AuthenticatedAdminJobsRoute
   '/admin/notifications': typeof AuthenticatedAdminNotificationsRoute
   '/admin/payments': typeof AuthenticatedAdminPaymentsRoute
@@ -252,6 +260,7 @@ export interface FileRoutesByTo {
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/admin/applicants': typeof AuthenticatedAdminApplicantsRoute
   '/admin/applications': typeof AuthenticatedAdminApplicationsRoute
+  '/admin/invoices': typeof AuthenticatedAdminInvoicesRoute
   '/admin/jobs': typeof AuthenticatedAdminJobsRoute
   '/admin/notifications': typeof AuthenticatedAdminNotificationsRoute
   '/admin/payments': typeof AuthenticatedAdminPaymentsRoute
@@ -285,6 +294,7 @@ export interface FileRoutesById {
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/_authenticated/admin/applicants': typeof AuthenticatedAdminApplicantsRoute
   '/_authenticated/admin/applications': typeof AuthenticatedAdminApplicationsRoute
+  '/_authenticated/admin/invoices': typeof AuthenticatedAdminInvoicesRoute
   '/_authenticated/admin/jobs': typeof AuthenticatedAdminJobsRoute
   '/_authenticated/admin/notifications': typeof AuthenticatedAdminNotificationsRoute
   '/_authenticated/admin/payments': typeof AuthenticatedAdminPaymentsRoute
@@ -318,6 +328,7 @@ export interface FileRouteTypes {
     | '/jobs/$jobId'
     | '/admin/applicants'
     | '/admin/applications'
+    | '/admin/invoices'
     | '/admin/jobs'
     | '/admin/notifications'
     | '/admin/payments'
@@ -348,6 +359,7 @@ export interface FileRouteTypes {
     | '/jobs/$jobId'
     | '/admin/applicants'
     | '/admin/applications'
+    | '/admin/invoices'
     | '/admin/jobs'
     | '/admin/notifications'
     | '/admin/payments'
@@ -380,6 +392,7 @@ export interface FileRouteTypes {
     | '/jobs/$jobId'
     | '/_authenticated/admin/applicants'
     | '/_authenticated/admin/applications'
+    | '/_authenticated/admin/invoices'
     | '/_authenticated/admin/jobs'
     | '/_authenticated/admin/notifications'
     | '/_authenticated/admin/payments'
@@ -603,6 +616,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminJobsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/invoices': {
+      id: '/_authenticated/admin/invoices'
+      path: '/invoices'
+      fullPath: '/admin/invoices'
+      preLoaderRoute: typeof AuthenticatedAdminInvoicesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/applications': {
       id: '/_authenticated/admin/applications'
       path: '/applications'
@@ -623,6 +643,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminApplicantsRoute: typeof AuthenticatedAdminApplicantsRoute
   AuthenticatedAdminApplicationsRoute: typeof AuthenticatedAdminApplicationsRoute
+  AuthenticatedAdminInvoicesRoute: typeof AuthenticatedAdminInvoicesRoute
   AuthenticatedAdminJobsRoute: typeof AuthenticatedAdminJobsRoute
   AuthenticatedAdminNotificationsRoute: typeof AuthenticatedAdminNotificationsRoute
   AuthenticatedAdminPaymentsRoute: typeof AuthenticatedAdminPaymentsRoute
@@ -635,6 +656,7 @@ interface AuthenticatedAdminRouteChildren {
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminApplicantsRoute: AuthenticatedAdminApplicantsRoute,
   AuthenticatedAdminApplicationsRoute: AuthenticatedAdminApplicationsRoute,
+  AuthenticatedAdminInvoicesRoute: AuthenticatedAdminInvoicesRoute,
   AuthenticatedAdminJobsRoute: AuthenticatedAdminJobsRoute,
   AuthenticatedAdminNotificationsRoute: AuthenticatedAdminNotificationsRoute,
   AuthenticatedAdminPaymentsRoute: AuthenticatedAdminPaymentsRoute,

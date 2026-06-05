@@ -1,7 +1,7 @@
 import { createFileRoute, Outlet, Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
 import { useEffect } from "react";
-import { LayoutDashboard, Users, FileText, CreditCard, Receipt, Briefcase, BarChart3, Bell, Settings, LogOut, ShieldCheck, Plane } from "lucide-react";
+import { LayoutDashboard, Users, FileText, CreditCard, Receipt, Briefcase, BarChart3, Bell, Settings, LogOut, ShieldCheck, Plane, FileSpreadsheet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/admin")({ component: AdminLayout });
@@ -12,6 +12,7 @@ const adminNav = [
   { to: "/admin/applications", label: "Applications", icon: FileText },
   { to: "/admin/payments", label: "Payments", icon: CreditCard },
   { to: "/admin/receipts", label: "Receipts", icon: Receipt },
+  { to: "/admin/invoices", label: "Invoices", icon: FileSpreadsheet },
   { to: "/admin/jobs", label: "Jobs", icon: Briefcase },
   { to: "/admin/reports", label: "Reports", icon: BarChart3 },
   { to: "/admin/notifications", label: "Notifications", icon: Bell },

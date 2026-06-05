@@ -51,7 +51,7 @@ function Applicants() {
 
 function EditApplicant({ row, onSaved }: { row: any; onSaved: () => void }) {
   const [open, setOpen] = useState(false);
-  const [f, setF] = useState({ full_name: row.full_name ?? "", phone: row.phone ?? "", district: row.district ?? "", profession: row.profession ?? "" });
+  const [f, setF] = useState({ full_name: row.full_name ?? "", phone: row.phone ?? "", address: row.address ?? "", profession: row.profession ?? "" });
   const save = async () => {
     const { error } = await supabase.from("profiles").update(f).eq("id", row.id);
     if (error) return toast.error(error.message);
@@ -65,7 +65,7 @@ function EditApplicant({ row, onSaved }: { row: any; onSaved: () => void }) {
         <div className="space-y-3">
           <div><Label>Full name</Label><Input value={f.full_name} onChange={(e)=>setF({...f, full_name: e.target.value})}/></div>
           <div><Label>Phone</Label><Input value={f.phone} onChange={(e)=>setF({...f, phone: e.target.value})}/></div>
-          <div><Label>District</Label><Input value={f.district} onChange={(e)=>setF({...f, district: e.target.value})}/></div>
+          <div><Label>Address</Label><Input value={f.address} onChange={(e)=>setF({...f, address: e.target.value})}/></div>
           <div><Label>Profession</Label><Input value={f.profession} onChange={(e)=>setF({...f, profession: e.target.value})}/></div>
           <Button onClick={save} className="bg-gradient-primary w-full">Save changes</Button>
         </div>

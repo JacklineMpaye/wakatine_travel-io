@@ -56,7 +56,7 @@ function AdminPayments() {
 
 function NewPayment({ onCreated }: { onCreated: ()=>void }) {
   const [open, setOpen] = useState(false);
-  const [f, setF] = useState({ user_id: "", amount: "", currency: "UGX", method: "Mobile Money", payment_type: "registration", reference: "", notes: "" });
+  const [f, setF] = useState<{ user_id: string; amount: string; currency: string; method: string; payment_type: "recruitment_processing" | "passport_processing" | "nin_assistance" | "other"; reference: string; notes: string }>({ user_id: "", amount: "", currency: "UGX", method: "Mobile Money", payment_type: "recruitment_processing", reference: "", notes: "" });
   const { data: profiles = [] } = useQuery({
     queryKey: ["all-profiles-min"],
     queryFn: async () => (await supabase.from("profiles").select("id, full_name, email").order("full_name")).data ?? [],
@@ -88,7 +88,14 @@ function NewPayment({ onCreated }: { onCreated: ()=>void }) {
             <div><Label>Currency</Label><Input value={f.currency} onChange={(e)=>setF({...f, currency: e.target.value})}/></div>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <div><Label>Type</Label><Input value={f.payment_type} onChange={(e)=>setF({...f, payment_type: e.target.value})}/></div>
+            <div><Label>Type</Label>
+              <select className="h-10 px-3 rounded-md border border-input bg-background w-full" value={f.payment_type} onChange={(e)=>setF({...f, payment_type: e.target.value as typeof f.payment_type})}>
+                <option value="recruitment_processing">Recruitment processing</option>
+                <option value="passport_processing">Passport processing</option>
+                <option value="nin_assistance">NIN assistance</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
             <div><Label>Method</Label><Input value={f.method} onChange={(e)=>setF({...f, method: e.target.value})}/></div>
           </div>
           <div><Label>Reference</Label><Input value={f.reference} onChange={(e)=>setF({...f, reference: e.target.value})}/></div>

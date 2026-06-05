@@ -127,8 +127,13 @@ function MyApplication() {
       if (!f.full_name || !f.date_of_birth || !f.gender || !f.phone || !f.district || !f.nin) {
         return toast.error("Please fill all required fields");
       }
-      if (!/^\d{14}$/.test(f.nin.replace(/\s/g, ""))) {
-        return toast.error("NIN should be 14 characters");
+      const ninClean = f.nin.trim();
+      console.log("[NIN validation] value:", JSON.stringify(f.nin), "trimmed:", JSON.stringify(ninClean), "length:", ninClean.length);
+      if (ninClean.length !== 14) {
+        return toast.error(`NIN should be 14 characters (you entered ${ninClean.length})`);
+      }
+      if (!/^[A-Z0-9]{14}$/i.test(ninClean)) {
+        return toast.error("NIN should contain only letters and numbers");
       }
     }
     if (step === 1) {

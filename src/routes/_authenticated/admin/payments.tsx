@@ -56,7 +56,7 @@ function AdminPayments() {
 
 function NewPayment({ onCreated }: { onCreated: ()=>void }) {
   const [open, setOpen] = useState(false);
-  const [f, setF] = useState({ user_id: "", amount: "", currency: "UGX", method: "Mobile Money", payment_type: "registration", reference: "", notes: "" });
+  const [f, setF] = useState<{ user_id: string; amount: string; currency: string; method: string; payment_type: "recruitment_processing" | "passport_processing" | "nin_assistance" | "other"; reference: string; notes: string }>({ user_id: "", amount: "", currency: "UGX", method: "Mobile Money", payment_type: "recruitment_processing", reference: "", notes: "" });
   const { data: profiles = [] } = useQuery({
     queryKey: ["all-profiles-min"],
     queryFn: async () => (await supabase.from("profiles").select("id, full_name, email").order("full_name")).data ?? [],

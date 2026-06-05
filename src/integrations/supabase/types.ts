@@ -240,6 +240,51 @@ export type Database = {
         }
         Relationships: []
       }
+      invoices: {
+        Row: {
+          amount_due: number
+          amount_paid: number
+          balance: number
+          created_at: string
+          created_by: string | null
+          id: string
+          invoice_number: string
+          notes: string | null
+          service: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount_due?: number
+          amount_paid?: number
+          balance?: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          invoice_number: string
+          notes?: string | null
+          service: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount_due?: number
+          amount_paid?: number
+          balance?: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          invoice_number?: string
+          notes?: string | null
+          service?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       jobs: {
         Row: {
           city: string | null
@@ -335,7 +380,9 @@ export type Database = {
         Row: {
           amount: number
           application_id: string | null
+          balance: number
           created_at: string
+          created_by: string | null
           currency: string | null
           id: string
           method: string | null
@@ -343,14 +390,18 @@ export type Database = {
           payment_type: Database["public"]["Enums"]["payment_type"]
           receipt_url: string | null
           reference: string | null
+          service_description: string | null
           status: Database["public"]["Enums"]["payment_status"]
+          total_amount: number | null
           updated_at: string
           user_id: string
         }
         Insert: {
           amount: number
           application_id?: string | null
+          balance?: number
           created_at?: string
+          created_by?: string | null
           currency?: string | null
           id?: string
           method?: string | null
@@ -358,14 +409,18 @@ export type Database = {
           payment_type?: Database["public"]["Enums"]["payment_type"]
           receipt_url?: string | null
           reference?: string | null
+          service_description?: string | null
           status?: Database["public"]["Enums"]["payment_status"]
+          total_amount?: number | null
           updated_at?: string
           user_id: string
         }
         Update: {
           amount?: number
           application_id?: string | null
+          balance?: number
           created_at?: string
+          created_by?: string | null
           currency?: string | null
           id?: string
           method?: string | null
@@ -373,7 +428,9 @@ export type Database = {
           payment_type?: Database["public"]["Enums"]["payment_type"]
           receipt_url?: string | null
           reference?: string | null
+          service_description?: string | null
           status?: Database["public"]["Enums"]["payment_status"]
+          total_amount?: number | null
           updated_at?: string
           user_id?: string
         }
@@ -390,14 +447,17 @@ export type Database = {
       profiles: {
         Row: {
           address: string | null
+          applicant_code: string | null
           avatar_url: string | null
           created_at: string
           date_of_birth: string | null
+          district: string | null
           education_level: string | null
           email: string | null
           full_name: string | null
           gender: string | null
           id: string
+          is_walk_in: boolean
           nationality: string | null
           phone: string | null
           profession: string | null
@@ -406,14 +466,17 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          applicant_code?: string | null
           avatar_url?: string | null
           created_at?: string
           date_of_birth?: string | null
+          district?: string | null
           education_level?: string | null
           email?: string | null
           full_name?: string | null
           gender?: string | null
           id: string
+          is_walk_in?: boolean
           nationality?: string | null
           phone?: string | null
           profession?: string | null
@@ -422,14 +485,17 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          applicant_code?: string | null
           avatar_url?: string | null
           created_at?: string
           date_of_birth?: string | null
+          district?: string | null
           education_level?: string | null
           email?: string | null
           full_name?: string | null
           gender?: string | null
           id?: string
+          is_walk_in?: boolean
           nationality?: string | null
           phone?: string | null
           profession?: string | null

@@ -45,11 +45,11 @@ export function Footer() {
         <div>
           <h4 className="font-semibold mb-3">Contact</h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
-            <li className="flex gap-2"><MapPin className="w-4 h-4 mt-0.5 text-gold" /> Iganga, behind Stanbic Bank</li>
-            <li className="flex gap-2"><Phone className="w-4 h-4 mt-0.5 text-gold" /> +256 789 431 312</li>
-            <li className="flex gap-2"><Phone className="w-4 h-4 mt-0.5 text-gold" /> +256 740 052 907</li>
-            <li className="flex gap-2"><Mail className="w-4 h-4 mt-0.5 text-gold" /> info@wakatine.ug</li>
-            <li><a href="https://wa.me/256789431312" target="_blank" rel="noreferrer" className="flex gap-2 hover:text-primary"><MessageCircle className="w-4 h-4 mt-0.5 text-gold" /> WhatsApp Us</a></li>
+            <li className="flex gap-2"><MapPin className="w-4 h-4 mt-0.5 text-gold" /><span>Iganga, behind Stanbic Bank</span></li>
+            <li className="flex gap-2"><Phone className="w-4 h-4 mt-0.5 text-gold" /><span>+256 789 431 312</span></li>
+            <li className="flex gap-2"><Phone className="w-4 h-4 mt-0.5 text-gold" /><span>+256 740 052 907</span></li>
+            <li className="flex gap-2"><Mail className="w-4 h-4 mt-0.5 text-gold" /><span>info@wakatine.ug</span></li>
+            <li><a href="https://wa.me/256789431312" target="_blank" rel="noreferrer" className="flex gap-2 hover:text-primary"><MessageCircle className="w-4 h-4 mt-0.5 text-gold" /><span>WhatsApp Us</span></a></li>
           </ul>
         </div>
       </div>

@@ -258,10 +258,10 @@ function EditPayment({ row, onSaved }: { row: any; onSaved: ()=>void }) {
             <Label>Status</Label>
             <select className="h-10 px-3 rounded-md border border-input bg-background w-full" value={f.status} onChange={(e)=>setF({...f, status: e.target.value})}>
               <option value="pending">pending</option>
+              <option value="partial">partial</option>
               <option value="verified">verified</option>
               <option value="paid">paid</option>
               <option value="overdue">overdue</option>
-              <option value="refunded">refunded</option>
             </select>
           </div>
           <Button className="w-full bg-gradient-primary" onClick={save}>Save</Button>

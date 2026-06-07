@@ -40,6 +40,7 @@ import { Route as AuthenticatedAdminJobsRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAdminInvoicesRouteImport } from './routes/_authenticated/admin/invoices'
 import { Route as AuthenticatedAdminApplicationsRouteImport } from './routes/_authenticated/admin/applications'
 import { Route as AuthenticatedAdminApplicantsRouteImport } from './routes/_authenticated/admin/applicants'
+import { Route as AuthenticatedAdminApplicantsIdRouteImport } from './routes/_authenticated/admin/applicants.$id'
 
 const TestimonialsRoute = TestimonialsRouteImport.update({
   id: '/testimonials',
@@ -205,6 +206,12 @@ const AuthenticatedAdminApplicantsRoute =
     path: '/applicants',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminApplicantsIdRoute =
+  AuthenticatedAdminApplicantsIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedAdminApplicantsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -227,7 +234,7 @@ export interface FileRoutesByFullPath {
   '/payments': typeof AuthenticatedPaymentsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
-  '/admin/applicants': typeof AuthenticatedAdminApplicantsRoute
+  '/admin/applicants': typeof AuthenticatedAdminApplicantsRouteWithChildren
   '/admin/applications': typeof AuthenticatedAdminApplicationsRoute
   '/admin/invoices': typeof AuthenticatedAdminInvoicesRoute
   '/admin/jobs': typeof AuthenticatedAdminJobsRoute
@@ -237,6 +244,7 @@ export interface FileRoutesByFullPath {
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/admin/applicants/$id': typeof AuthenticatedAdminApplicantsIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -258,7 +266,7 @@ export interface FileRoutesByTo {
   '/payments': typeof AuthenticatedPaymentsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
-  '/admin/applicants': typeof AuthenticatedAdminApplicantsRoute
+  '/admin/applicants': typeof AuthenticatedAdminApplicantsRouteWithChildren
   '/admin/applications': typeof AuthenticatedAdminApplicationsRoute
   '/admin/invoices': typeof AuthenticatedAdminInvoicesRoute
   '/admin/jobs': typeof AuthenticatedAdminJobsRoute
@@ -268,6 +276,7 @@ export interface FileRoutesByTo {
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/admin/applicants/$id': typeof AuthenticatedAdminApplicantsIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -292,7 +301,7 @@ export interface FileRoutesById {
   '/_authenticated/payments': typeof AuthenticatedPaymentsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
-  '/_authenticated/admin/applicants': typeof AuthenticatedAdminApplicantsRoute
+  '/_authenticated/admin/applicants': typeof AuthenticatedAdminApplicantsRouteWithChildren
   '/_authenticated/admin/applications': typeof AuthenticatedAdminApplicationsRoute
   '/_authenticated/admin/invoices': typeof AuthenticatedAdminInvoicesRoute
   '/_authenticated/admin/jobs': typeof AuthenticatedAdminJobsRoute
@@ -302,6 +311,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/admin/applicants/$id': typeof AuthenticatedAdminApplicantsIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -336,6 +346,7 @@ export interface FileRouteTypes {
     | '/admin/reports'
     | '/admin/settings'
     | '/admin/'
+    | '/admin/applicants/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -367,6 +378,7 @@ export interface FileRouteTypes {
     | '/admin/reports'
     | '/admin/settings'
     | '/admin'
+    | '/admin/applicants/$id'
   id:
     | '__root__'
     | '/'
@@ -400,6 +412,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/reports'
     | '/_authenticated/admin/settings'
     | '/_authenticated/admin/'
+    | '/_authenticated/admin/applicants/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -637,11 +650,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminApplicantsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/applicants/$id': {
+      id: '/_authenticated/admin/applicants/$id'
+      path: '/$id'
+      fullPath: '/admin/applicants/$id'
+      preLoaderRoute: typeof AuthenticatedAdminApplicantsIdRouteImport
+      parentRoute: typeof AuthenticatedAdminApplicantsRoute
+    }
   }
 }
 
+interface AuthenticatedAdminApplicantsRouteChildren {
+  AuthenticatedAdminApplicantsIdRoute: typeof AuthenticatedAdminApplicantsIdRoute
+}
+
+const AuthenticatedAdminApplicantsRouteChildren: AuthenticatedAdminApplicantsRouteChildren =
+  {
+    AuthenticatedAdminApplicantsIdRoute: AuthenticatedAdminApplicantsIdRoute,
+  }
+
+const AuthenticatedAdminApplicantsRouteWithChildren =
+  AuthenticatedAdminApplicantsRoute._addFileChildren(
+    AuthenticatedAdminApplicantsRouteChildren,
+  )
+
 interface AuthenticatedAdminRouteChildren {
-  AuthenticatedAdminApplicantsRoute: typeof AuthenticatedAdminApplicantsRoute
+  AuthenticatedAdminApplicantsRoute: typeof AuthenticatedAdminApplicantsRouteWithChildren
   AuthenticatedAdminApplicationsRoute: typeof AuthenticatedAdminApplicationsRoute
   AuthenticatedAdminInvoicesRoute: typeof AuthenticatedAdminInvoicesRoute
   AuthenticatedAdminJobsRoute: typeof AuthenticatedAdminJobsRoute
@@ -654,7 +688,8 @@ interface AuthenticatedAdminRouteChildren {
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
-  AuthenticatedAdminApplicantsRoute: AuthenticatedAdminApplicantsRoute,
+  AuthenticatedAdminApplicantsRoute:
+    AuthenticatedAdminApplicantsRouteWithChildren,
   AuthenticatedAdminApplicationsRoute: AuthenticatedAdminApplicationsRoute,
   AuthenticatedAdminInvoicesRoute: AuthenticatedAdminInvoicesRoute,
   AuthenticatedAdminJobsRoute: AuthenticatedAdminJobsRoute,
@@ -721,13 +756,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

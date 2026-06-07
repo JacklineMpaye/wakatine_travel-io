@@ -11,8 +11,9 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/_authenticated/admin/applications")({ component: AdminApplications });
 
 const STATUSES = [
-  "registration_submitted","documents_pending","documents_verified","interview_scheduled",
-  "interview_passed","medical_check_pending","visa_processing","visa_approved","flight_scheduled","deployed_abroad","rejected",
+  "draft","registration_submitted","under_review","approved","documents_pending","documents_verified",
+  "interview_scheduled","interview_passed","medical_check_pending","visa_processing","visa_approved",
+  "flight_scheduled","deployed_abroad","rejected",
 ];
 
 function AdminApplications() {

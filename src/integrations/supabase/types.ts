@@ -137,6 +137,9 @@ export type Database = {
         Row: {
           admin_notes: string | null
           applicant_id: string
+          assigned_job_country: string | null
+          assigned_job_description: string | null
+          assigned_job_title: string | null
           cover_letter: string | null
           created_at: string
           id: string
@@ -147,6 +150,9 @@ export type Database = {
         Insert: {
           admin_notes?: string | null
           applicant_id: string
+          assigned_job_country?: string | null
+          assigned_job_description?: string | null
+          assigned_job_title?: string | null
           cover_letter?: string | null
           created_at?: string
           id?: string
@@ -157,6 +163,9 @@ export type Database = {
         Update: {
           admin_notes?: string | null
           applicant_id?: string
+          assigned_job_country?: string | null
+          assigned_job_description?: string | null
+          assigned_job_title?: string | null
           cover_letter?: string | null
           created_at?: string
           id?: string
@@ -385,6 +394,7 @@ export type Database = {
           created_by: string | null
           currency: string | null
           id: string
+          invoice_id: string | null
           method: string | null
           notes: string | null
           payment_type: Database["public"]["Enums"]["payment_type"]
@@ -404,6 +414,7 @@ export type Database = {
           created_by?: string | null
           currency?: string | null
           id?: string
+          invoice_id?: string | null
           method?: string | null
           notes?: string | null
           payment_type?: Database["public"]["Enums"]["payment_type"]
@@ -423,6 +434,7 @@ export type Database = {
           created_by?: string | null
           currency?: string | null
           id?: string
+          invoice_id?: string | null
           method?: string | null
           notes?: string | null
           payment_type?: Database["public"]["Enums"]["payment_type"]
@@ -440,6 +452,13 @@ export type Database = {
             columns: ["application_id"]
             isOneToOne: false
             referencedRelation: "applications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
             referencedColumns: ["id"]
           },
         ]
@@ -581,6 +600,9 @@ export type Database = {
         | "flight_scheduled"
         | "deployed_abroad"
         | "rejected"
+        | "draft"
+        | "under_review"
+        | "approved"
       document_status: "pending" | "verified" | "rejected"
       document_type:
         | "passport"
@@ -735,6 +757,9 @@ export const Constants = {
         "flight_scheduled",
         "deployed_abroad",
         "rejected",
+        "draft",
+        "under_review",
+        "approved",
       ],
       document_status: ["pending", "verified", "rejected"],
       document_type: [

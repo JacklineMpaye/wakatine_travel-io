@@ -24,13 +24,14 @@ function AdminPayments() {
   const qc = useQueryClient();
   const { data: pays = [] } = useQuery({
     queryKey: ["admin-pays"],
-    queryFn: async () => (await supabase.from("payments").select("*, profiles(full_name, email, phone, applicant_code)").order("created_at", { ascending: false })).data ?? [],
+    queryFn: async () => (await supabase.from("payments").select("*, profiles(full_name, email, phone, applicant_code), invoices(invoice_number, service)").order("created_at", { ascending: false })).data ?? [],
   });
   const verify = async (id: string) => {
     const { error } = await supabase.from("payments").update({ status: "verified" as any }).eq("id", id);
     if (error) return toast.error(error.message);
     toast.success("Verified");
     qc.invalidateQueries({ queryKey: ["admin-pays"] });
+    qc.invalidateQueries({ queryKey: ["admin-invoices"] });
   };
   return (
     <div className="space-y-6">
@@ -38,7 +39,7 @@ function AdminPayments() {
         <div>
           <div className="text-xs uppercase tracking-widest text-primary font-semibold mb-1">Admin · Payments</div>
           <h1 className="text-3xl font-bold">Payments</h1>
-          <p className="text-muted-foreground">Create records for existing or walk-in applicants, verify and update balances.</p>
+          <p className="text-muted-foreground">Record verified payments instantly. For money still owed, create an invoice from the Invoices page.</p>
         </div>
         <NewPayment onCreated={()=>qc.invalidateQueries({ queryKey: ["admin-pays"] })}/>
       </div>
@@ -52,6 +53,7 @@ function AdminPayments() {
                 {p.total_amount ? ` of ${p.currency} ${Number(p.total_amount).toLocaleString()}` : ""}
                 {" · "}{p.service_description ?? p.payment_type ?? "—"} · {p.method ?? "—"}
               </div>
+              {p.invoices?.invoice_number && <div className="text-xs text-primary mt-1">Applied to {p.invoices.invoice_number} — {p.invoices.service}</div>}
               {Number(p.balance) > 0 && <div className="text-xs text-destructive mt-1">Balance: {p.currency} {Number(p.balance).toLocaleString()}</div>}
               {p.notes && <div className="text-xs text-muted-foreground mt-1">{p.notes}</div>}
             </div>
@@ -78,11 +80,16 @@ function NewPayment({ onCreated }: { onCreated: ()=>void }) {
     user_id: "", full_name: "", phone: "", district: "", nin: "",
     amount: "", total_amount: "", currency: "UGX", method: "Mobile Money",
     payment_type: "recruitment_processing" as "recruitment_processing" | "passport_processing" | "nin_assistance" | "other",
-    service_description: "", reference: "", notes: "",
+    service_description: "", reference: "", notes: "", invoice_id: "",
   });
   const { data: profiles = [] } = useQuery({
     queryKey: ["all-profiles-min"],
     queryFn: async () => (await supabase.from("profiles").select("id, full_name, email, applicant_code").order("applicant_code")).data ?? [],
+  });
+  const { data: openInvoices = [] } = useQuery({
+    queryKey: ["open-invoices-for", f.user_id],
+    queryFn: async () => (await supabase.from("invoices").select("id, invoice_number, service, amount_due, balance, status").eq("user_id", f.user_id).in("status", ["unpaid", "partial"])).data ?? [],
+    enabled: !!f.user_id && mode === "existing",
   });
 
   const validate = (): Errors => {
@@ -129,21 +136,23 @@ function NewPayment({ onCreated }: { onCreated: ()=>void }) {
       currency: f.currency, method: f.method,
       payment_type: f.payment_type, service_description: f.service_description || null,
       reference: f.reference || null, notes: f.notes || null,
-      status: "pending", created_by: user?.id ?? null,
+      status: "verified", created_by: user?.id ?? null,
+      invoice_id: f.invoice_id || null,
     });
     if (error) return toast.error(error.message);
-    toast.success("Payment created");
+    toast.success("Payment recorded & verified");
     setOpen(false); setErrors({});
-    setF({ user_id: "", full_name: "", phone: "", district: "", nin: "", amount: "", total_amount: "", currency: "UGX", method: "Mobile Money", payment_type: "recruitment_processing", service_description: "", reference: "", notes: "" });
+    setF({ user_id: "", full_name: "", phone: "", district: "", nin: "", amount: "", total_amount: "", currency: "UGX", method: "Mobile Money", payment_type: "recruitment_processing", service_description: "", reference: "", notes: "", invoice_id: "" });
     onCreated();
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild><Button className="bg-gradient-primary"><Plus className="w-4 h-4 mr-1"/>New payment</Button></DialogTrigger>
+      <DialogTrigger asChild><Button className="bg-gradient-primary"><Plus className="w-4 h-4 mr-1"/>Record payment</Button></DialogTrigger>
       <DialogContent className="max-h-[90vh] overflow-y-auto">
-        <DialogHeader><DialogTitle>Create payment record</DialogTitle></DialogHeader>
+        <DialogHeader><DialogTitle>Record verified payment</DialogTitle></DialogHeader>
         <div className="space-y-3">
+          <p className="text-xs text-muted-foreground bg-secondary/40 p-2 rounded">Use this when cash has been received. The payment will appear on the applicant's account as <b>Verified</b> immediately. To bill for money <i>owed</i>, create an Invoice instead.</p>
           <div className="grid grid-cols-2 gap-2">
             <Button type="button" variant={mode==="existing"?"default":"outline"} size="sm" onClick={()=>{setMode("existing"); setErrors({});}}><UserCheck className="w-4 h-4 mr-1"/>Existing applicant</Button>
             <Button type="button" variant={mode==="walkin"?"default":"outline"} size="sm" onClick={()=>{setMode("walkin"); setErrors({});}}><UserPlus className="w-4 h-4 mr-1"/>Walk-in applicant</Button>
@@ -161,6 +170,18 @@ function NewPayment({ onCreated }: { onCreated: ()=>void }) {
                 ))}
               </select>
               {errors.user_id && <p className="text-xs text-destructive mt-1">{errors.user_id}</p>}
+              {openInvoices.length > 0 && (
+                <div className="mt-2">
+                  <Label>Apply to invoice (optional)</Label>
+                  <select className="h-10 px-3 rounded-md border border-input bg-background w-full" value={f.invoice_id} onChange={(e)=>setF({...f, invoice_id: e.target.value})}>
+                    <option value="">— Standalone payment —</option>
+                    {openInvoices.map((inv: any) => (
+                      <option key={inv.id} value={inv.id}>{inv.invoice_number} · {inv.service} · balance UGX {Number(inv.balance).toLocaleString()}</option>
+                    ))}
+                  </select>
+                  <p className="text-[11px] text-muted-foreground mt-1">Applying to an invoice will automatically update its balance and status.</p>
+                </div>
+              )}
             </div>
           ) : (
             <div className="space-y-3 border border-border rounded-md p-3 bg-secondary/30">

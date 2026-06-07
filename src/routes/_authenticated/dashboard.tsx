@@ -11,7 +11,8 @@ import { Briefcase, FolderOpen, CreditCard, Bell, ArrowRight, ClipboardCheck } f
 export const Route = createFileRoute("/_authenticated/dashboard")({ component: Dashboard });
 
 const STATUS_LABEL: Record<string, string> = {
-  registration_submitted: "Registration", documents_pending: "Docs Pending", documents_verified: "Docs Verified",
+  draft: "Draft", registration_submitted: "Submitted", under_review: "Under Review", approved: "Approved",
+  documents_pending: "Docs Pending", documents_verified: "Docs Verified",
   interview_scheduled: "Interview Scheduled", interview_passed: "Interview Passed", medical_check_pending: "Medical",
   visa_processing: "Visa Processing", visa_approved: "Visa Approved", flight_scheduled: "Flight Scheduled", deployed_abroad: "Deployed", rejected: "Rejected",
 };

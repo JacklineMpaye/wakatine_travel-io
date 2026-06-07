@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-import { Search, Pencil, Eye } from "lucide-react";
+import { Search, Pencil, FileSearch } from "lucide-react";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -57,7 +57,9 @@ function Applicants() {
               {r.profession && <div className="text-xs text-muted-foreground mt-1">{r.profession}</div>}
             </div>
             <div className="flex gap-2">
-              <ViewApplicant row={r}/>
+              <Link to="/admin/applicants/$id" params={{ id: r.id }}>
+                <Button size="sm" variant="outline"><FileSearch className="w-4 h-4 mr-1"/>Open profile</Button>
+              </Link>
               <EditApplicant row={r} onSaved={()=>qc.invalidateQueries({ queryKey: ["admin-applicants"] })}/>
             </div>
           </Card>
@@ -87,71 +89,6 @@ function EditApplicant({ row, onSaved }: { row: any; onSaved: () => void }) {
           <div><Label>Address</Label><Input value={f.address} onChange={(e)=>setF({...f, address: e.target.value})}/></div>
           <div><Label>Profession</Label><Input value={f.profession} onChange={(e)=>setF({...f, profession: e.target.value})}/></div>
           <Button onClick={save} className="bg-gradient-primary w-full">Save changes</Button>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-function ViewApplicant({ row }: { row: any }) {
-  const [open, setOpen] = useState(false);
-  const { data: details } = useQuery({
-    queryKey: ["applicant-details", row.id],
-    queryFn: async () => {
-      const [appDetails, docs, apps, pays] = await Promise.all([
-        supabase.from("application_details").select("*").eq("user_id", row.id).maybeSingle(),
-        supabase.from("documents").select("*").eq("user_id", row.id),
-        supabase.from("applications").select("*, jobs(title, country)").eq("applicant_id", row.id),
-        supabase.from("payments").select("amount, currency, status, payment_type, created_at").eq("user_id", row.id),
-      ]);
-      return { details: appDetails.data, docs: docs.data ?? [], apps: apps.data ?? [], pays: pays.data ?? [] };
-    },
-    enabled: open,
-  });
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild><Button size="sm" variant="outline"><Eye className="w-4 h-4 mr-1"/>View</Button></DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader><DialogTitle>{row.applicant_code} · {row.full_name ?? "(no name)"}</DialogTitle></DialogHeader>
-        <div className="space-y-4 text-sm">
-          <div className="grid grid-cols-2 gap-2">
-            <div><span className="text-muted-foreground">Email:</span> {row.email ?? "—"}</div>
-            <div><span className="text-muted-foreground">Phone:</span> {row.phone ?? "—"}</div>
-            <div><span className="text-muted-foreground">District:</span> {row.district ?? "—"}</div>
-            <div><span className="text-muted-foreground">Profession:</span> {row.profession ?? "—"}</div>
-            <div><span className="text-muted-foreground">Gender:</span> {row.gender ?? "—"}</div>
-            <div><span className="text-muted-foreground">DOB:</span> {row.date_of_birth ?? "—"}</div>
-          </div>
-          {details?.details && (
-            <div>
-              <div className="font-semibold mb-1">Registration details</div>
-              <div className="text-xs text-muted-foreground">NIN: {details.details.nin ?? "—"} · Passport: {details.details.passport_number ?? "—"} · Next of kin: {details.details.next_of_kin_name ?? "—"} ({details.details.next_of_kin_phone ?? "—"})</div>
-              <div className="text-xs text-muted-foreground">Desired job: {details.details.desired_job ?? "—"} · Expected salary: {details.details.salary_expectation_ugx ? `UGX ${Number(details.details.salary_expectation_ugx).toLocaleString()}` : "—"}</div>
-            </div>
-          )}
-          <div>
-            <div className="font-semibold mb-1">Documents ({details?.docs.length ?? 0})</div>
-            {details?.docs.length ? (
-              <ul className="text-xs space-y-1">{details.docs.map((d: any) => (
-                <li key={d.id} className="flex justify-between border-b border-border py-1">
-                  <span>{d.type} · {d.file_name ?? d.file_path}</span>
-                  <span className="text-muted-foreground">{d.status}</span>
-                </li>
-              ))}</ul>
-            ) : <div className="text-xs text-muted-foreground">No documents uploaded.</div>}
-          </div>
-          <div>
-            <div className="font-semibold mb-1">Applications ({details?.apps.length ?? 0})</div>
-            {details?.apps.length ? details.apps.map((a: any) => (
-              <div key={a.id} className="text-xs border-b border-border py-1">{a.jobs?.title ?? "—"} · {a.jobs?.country ?? "—"} · {a.status}</div>
-            )) : <div className="text-xs text-muted-foreground">No applications.</div>}
-          </div>
-          <div>
-            <div className="font-semibold mb-1">Payments ({details?.pays.length ?? 0})</div>
-            {details?.pays.length ? details.pays.map((p: any, i: number) => (
-              <div key={i} className="text-xs border-b border-border py-1">{p.currency} {Number(p.amount).toLocaleString()} · {p.payment_type} · {p.status}</div>
-            )) : <div className="text-xs text-muted-foreground">No payments.</div>}
-          </div>
         </div>
       </DialogContent>
     </Dialog>

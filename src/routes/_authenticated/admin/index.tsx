@@ -50,8 +50,9 @@ function AdminHome() {
         {[
           { to: "/admin/applicants", l: "Applicants", d: "View, search and edit all applicants." },
           { to: "/admin/applications", l: "Applications", d: "Review submissions and update status." },
-          { to: "/admin/payments", l: "Payments", d: "Record and verify payments." },
-          { to: "/admin/receipts", l: "Receipts", d: "Generate invoices and receipts." },
+          { to: "/admin/payments", l: "Payments", d: "Record verified payments instantly." },
+          { to: "/admin/invoices", l: "Invoices", d: "Bill applicants for money owed." },
+          { to: "/admin/receipts", l: "Receipts", d: "Print & download receipts." },
           { to: "/admin/jobs", l: "Jobs", d: "Create and manage UAE job listings." },
           { to: "/admin/reports", l: "Reports", d: "Deployment, payment and applicant analytics." },
         ].map((q) => (

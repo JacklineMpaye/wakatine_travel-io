@@ -437,7 +437,13 @@ function buildReportHtml(data: any, type: "biodata"|"full", jobDescOverride: str
   const job = app?.jobs;
   const assignedTitle = app?.assigned_job_title || job?.title || d.desired_job || "—";
   const assignedCountry = app?.assigned_job_country || job?.country || "—";
+  const assignedEmployer = app?.assigned_job_employer || job?.employer || "—";
+  const assignedSalary = app?.assigned_job_salary || "—";
+  const assignedBenefits = app?.assigned_job_benefits || "—";
+  const assignedContract = app?.assigned_job_contract_duration || "—";
   const jobDesc = jobDescOverride.trim() || app?.assigned_job_description || "";
+  const preferredJobs: string[] = (d.preferred_jobs ?? []) as string[];
+  const reason: string = (d.reason_for_abroad ?? "") as string;
   const reportTitle = type === "biodata" ? "BIODATA SUMMARY" : "FULL APPLICATION REPORT";
 
   const row = (k: string, v: any) => `<tr><th>${k}</th><td>${v ?? "—"}</td></tr>`;
@@ -474,26 +480,39 @@ function buildReportHtml(data: any, type: "biodata"|"full", jobDescOverride: str
     ${row("Profession", p.profession)}
     ${row("Years of experience", p.years_experience)}
     ${row("Education level", p.education_level)}
-    ${row("Desired job", d.desired_job)}
+    ${row("Primary desired job", d.desired_job)}
+    ${row("Other preferred jobs", preferredJobs.length ? preferredJobs.join(", ") : null)}
     ${row("Expected salary (UGX)", d.salary_expectation_ugx ? Number(d.salary_expectation_ugx).toLocaleString() : null)}
+    ${row("Why work abroad", reason ? reason.replace(/\n/g,"<br/>") : null)}
   </table>`;
 
-  const application = `<h2>Application</h2><table class="info">
-    ${row("Assigned job", assignedTitle)}
+  const preferredBlock = `<h2>Preferred Jobs (Applicant)</h2><table class="info">
+    ${row("Primary desired", d.desired_job)}
+    ${row("Also willing to do", preferredJobs.length ? preferredJobs.join(", ") : null)}
+    ${row("Expected salary (UGX/mo)", d.salary_expectation_ugx ? Number(d.salary_expectation_ugx).toLocaleString() : null)}
+    ${row("Why work abroad", reason ? reason.replace(/\n/g,"<br/>") : null)}
+  </table>`;
+
+  const application = `<h2>Assigned Job (Wakatine)</h2><table class="info">
+    ${row("Job title", assignedTitle)}
     ${row("Country", assignedCountry)}
-    ${row("Employer", job?.employer)}
-    ${row("Status", app ? (app.status as string).replace(/_/g," ").toUpperCase() : "—")}
+    ${row("Employer", assignedEmployer)}
+    ${row("Salary", assignedSalary)}
+    ${row("Contract duration", assignedContract)}
+    ${row("Benefits", assignedBenefits)}
+    ${row("Application status", app ? (app.status as string).replace(/_/g," ").toUpperCase() : "—")}
   </table>`;
 
   const jobBlock = (assignedTitle !== "—" || jobDesc) ? `<h2>Job Description</h2>
     <div class="job">
       <div class="job-head"><b>${assignedTitle}</b>${assignedCountry && assignedCountry !== "—" ? ` &mdash; ${assignedCountry}` : ""}</div>
       ${jobDesc ? `<div class="job-desc">${jobDesc.replace(/\n/g, "<br/>")}</div>` : `<div class="job-desc" style="color:#999">No description attached.</div>`}
+      ${app?.assigned_job_description_path ? `<div class="job-desc" style="margin-top:8px;color:#666;font-size:11px"><em>An additional job-description document is on file: ${(app.assigned_job_description_path as string).split("/").pop()}</em></div>` : ""}
     </div>` : "";
 
   const body = type === "biodata"
-    ? `${personal}${application}${jobBlock}`
-    : `${personal}${identity}${family}${employment}${application}${jobBlock}`;
+    ? `${personal}${preferredBlock}${application}${jobBlock}`
+    : `${personal}${identity}${family}${employment}${preferredBlock}${application}${jobBlock}`;
 
   return `<!doctype html><html><head><title>${reportTitle} · ${p.full_name ?? p.applicant_code}</title>
 <style>

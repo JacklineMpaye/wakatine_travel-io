@@ -154,7 +154,9 @@ function MyApplication() {
       if (f.has_passport === "yes" && !f.passport_number) return toast.error("Enter passport number");
     }
     if (step === 3) {
-      if (!f.desired_job || !f.salary_expectation_ugx) return toast.error("Choose a job and salary expectation");
+      if (!f.desired_job || !f.salary_expectation_ugx) return toast.error("Choose a primary desired job and salary expectation");
+      if (!f.preferred_jobs || f.preferred_jobs.length === 0) return toast.error("Pick at least one preferred job");
+      if (!f.reason_for_abroad.trim()) return toast.error("Tell us why you want to work abroad");
     }
     await save();
     setStep((s) => Math.min(s + 1, STEPS.length - 1));

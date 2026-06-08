@@ -8,7 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ArrowLeft, FileDown, Briefcase, Save, FileText, Printer } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { ArrowLeft, FileDown, Briefcase, Save, FileText, Printer, Upload } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -30,6 +31,7 @@ const STATUS_LABEL: Record<string, string> = {
 function ApplicantProfile() {
   const { id } = useParams({ from: "/_authenticated/admin/applicants/$id" });
   const qc = useQueryClient();
+  const refetch = () => qc.invalidateQueries({ queryKey: ["admin-applicant-full", id] });
   const { data, isLoading } = useQuery({
     queryKey: ["admin-applicant-full", id],
     queryFn: async () => {
@@ -56,9 +58,10 @@ function ApplicantProfile() {
   const app = data.apps[0]; // primary application
   const totalPaid = data.pays.filter((x: any) => x.status === "verified" || x.status === "paid").reduce((s: number, x: any) => s + Number(x.amount), 0);
   const totalOwed = data.invs.reduce((s: number, x: any) => s + Number(x.balance), 0);
+  const verifiedPays = data.pays.filter((x: any) => x.status === "verified" || x.status === "paid");
 
   return (
-    <div className="space-y-6 max-w-5xl">
+    <div className="space-y-6 max-w-6xl">
       <div className="flex justify-between flex-wrap gap-3 items-start">
         <div>
           <Link to="/admin/applicants" className="text-xs text-muted-foreground hover:text-primary inline-flex items-center gap-1"><ArrowLeft className="w-3 h-3"/>Back to applicants</Link>
@@ -69,9 +72,7 @@ function ApplicantProfile() {
           </h1>
           <p className="text-muted-foreground">{p.email ?? "—"} · {p.phone ?? "—"}</p>
         </div>
-        <div className="flex gap-2 flex-wrap">
-          <ExportReportButton data={data} />
-        </div>
+        <div className="flex gap-2 flex-wrap"><ExportReportButton data={data}/></div>
       </div>
 
       <div className="grid sm:grid-cols-3 gap-3">
@@ -80,83 +81,143 @@ function ApplicantProfile() {
         <Card className="p-4"><div className="text-xs uppercase tracking-widest text-muted-foreground">Application status</div><div className="text-xl font-bold">{app ? STATUS_LABEL[app.status] : "—"}</div></Card>
       </div>
 
-      <Section title="Personal details">
-        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 text-sm">
-          <Field label="Full name" value={p.full_name}/>
-          <Field label="Date of birth" value={p.date_of_birth}/>
-          <Field label="Gender" value={p.gender}/>
-          <Field label="Nationality" value={p.nationality}/>
-          <Field label="District" value={p.district}/>
-          <Field label="Address" value={p.address}/>
-          <Field label="Profession" value={p.profession}/>
-          <Field label="Years experience" value={p.years_experience}/>
-          <Field label="Education" value={p.education_level}/>
-        </div>
-      </Section>
+      <Tabs defaultValue="profile" className="w-full">
+        <TabsList className="flex flex-wrap h-auto">
+          <TabsTrigger value="profile">Profile</TabsTrigger>
+          <TabsTrigger value="application">Application</TabsTrigger>
+          <TabsTrigger value="documents">Documents ({data.docs.length})</TabsTrigger>
+          <TabsTrigger value="payments">Payments ({data.pays.length})</TabsTrigger>
+          <TabsTrigger value="receipts">Receipts ({verifiedPays.length})</TabsTrigger>
+          <TabsTrigger value="job">Assigned Job</TabsTrigger>
+          <TabsTrigger value="reports">Reports</TabsTrigger>
+          <TabsTrigger value="notes">Notes</TabsTrigger>
+        </TabsList>
 
-      <Section title="Application details">
-        {data.details ? (
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 text-sm">
-            <Field label="NIN" value={data.details.nin}/>
-            <Field label="Passport #" value={data.details.passport_number}/>
-            <Field label="Has passport" value={data.details.has_passport === null ? "—" : data.details.has_passport ? "Yes" : "No"}/>
-            <Field label="Village" value={data.details.village}/>
-            <Field label="Father status" value={data.details.father_status}/>
-            <Field label="Mother status" value={data.details.mother_status}/>
-            <Field label="Next of kin" value={data.details.next_of_kin_name}/>
-            <Field label="Next of kin phone" value={data.details.next_of_kin_phone}/>
-            <Field label="Relationship" value={data.details.next_of_kin_relationship}/>
-            <Field label="Desired job" value={data.details.desired_job}/>
-            <Field label="Expected salary" value={data.details.salary_expectation_ugx ? `UGX ${Number(data.details.salary_expectation_ugx).toLocaleString()}` : null}/>
-            <Field label="Submitted" value={data.details.submitted ? "Yes" : "No"}/>
-          </div>
-        ) : <div className="text-sm text-muted-foreground">No registration form submitted yet.</div>}
-      </Section>
-
-      {app && (
-        <Section title="Application status & job assignment">
-          <ApplicationControls app={app} jobs={data.jobs} onChange={() => qc.invalidateQueries({ queryKey: ["admin-applicant-full", id] })}/>
-        </Section>
-      )}
-
-      <Section title={`Documents (${data.docs.length})`}>
-        {data.docs.length === 0 ? <div className="text-sm text-muted-foreground">No documents uploaded.</div> : (
-          <ul className="text-sm space-y-1">{data.docs.map((d: any) => (
-            <li key={d.id} className="flex justify-between border-b border-border py-1.5">
-              <span><b>{d.type}</b> · {d.file_name ?? d.file_path}</span>
-              <Badge variant={d.status === "approved" ? "default" : d.status === "rejected" ? "destructive" : "secondary"}>{d.status}</Badge>
-            </li>
-          ))}</ul>
-        )}
-      </Section>
-
-      <Section title={`Payments (${data.pays.length})`}>
-        {data.pays.length === 0 ? <div className="text-sm text-muted-foreground">No payments recorded.</div> : (
-          <div className="space-y-1.5 text-sm">{data.pays.map((x: any) => (
-            <div key={x.id} className="flex justify-between border-b border-border py-1.5">
-              <span>{x.currency} {Number(x.amount).toLocaleString()} · {x.service_description ?? x.payment_type} · {x.method ?? "—"}</span>
-              <Badge variant={x.status === "verified" || x.status === "paid" ? "default" : "secondary"}>{x.status === "verified" || x.status === "paid" ? "Paid" : x.status}</Badge>
+        <TabsContent value="profile" className="mt-4">
+          <Section title="Biodata">
+            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 text-sm">
+              <Field label="Full name" value={p.full_name}/>
+              <Field label="Date of birth" value={p.date_of_birth}/>
+              <Field label="Gender" value={p.gender}/>
+              <Field label="Nationality" value={p.nationality}/>
+              <Field label="District" value={p.district}/>
+              <Field label="Address" value={p.address}/>
+              <Field label="Profession" value={p.profession}/>
+              <Field label="Years experience" value={p.years_experience}/>
+              <Field label="Education" value={p.education_level}/>
+              <Field label="Phone" value={p.phone}/>
+              <Field label="Email" value={p.email}/>
             </div>
-          ))}</div>
-        )}
-      </Section>
+          </Section>
+        </TabsContent>
 
-      <Section title={`Invoices (${data.invs.length})`}>
-        {data.invs.length === 0 ? <div className="text-sm text-muted-foreground">No invoices issued.</div> : (
-          <div className="space-y-1.5 text-sm">{data.invs.map((x: any) => (
-            <div key={x.id} className="flex justify-between border-b border-border py-1.5">
-              <span><b>{x.invoice_number}</b> · {x.service} · Due UGX {Number(x.amount_due).toLocaleString()} · Paid UGX {Number(x.amount_paid).toLocaleString()}</span>
-              <Badge variant={x.status==="paid"?"default":x.status==="cancelled"?"outline":"secondary"}>{x.status}</Badge>
-            </div>
-          ))}</div>
-        )}
-      </Section>
+        <TabsContent value="application" className="mt-4 space-y-4">
+          <Section title="Registration form">
+            {data.details ? (
+              <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 text-sm">
+                <Field label="NIN" value={data.details.nin}/>
+                <Field label="Passport #" value={data.details.passport_number}/>
+                <Field label="Has passport" value={data.details.has_passport === null ? "—" : data.details.has_passport ? "Yes" : "No"}/>
+                <Field label="Village" value={data.details.village}/>
+                <Field label="Father status" value={data.details.father_status}/>
+                <Field label="Mother status" value={data.details.mother_status}/>
+                <Field label="Next of kin" value={data.details.next_of_kin_name}/>
+                <Field label="Next of kin phone" value={data.details.next_of_kin_phone}/>
+                <Field label="Relationship" value={data.details.next_of_kin_relationship}/>
+                <Field label="Primary desired job" value={data.details.desired_job}/>
+                <Field label="Expected salary" value={data.details.salary_expectation_ugx ? `UGX ${Number(data.details.salary_expectation_ugx).toLocaleString()}` : null}/>
+                <Field label="Submitted" value={data.details.submitted ? "Yes" : "No"}/>
+                <div className="sm:col-span-2 md:col-span-3">
+                  <div className="text-[11px] uppercase tracking-wide text-muted-foreground">Preferred jobs</div>
+                  <div className="flex flex-wrap gap-1.5 mt-1">
+                    {((data.details as any).preferred_jobs ?? []).length === 0
+                      ? <span className="text-muted-foreground">—</span>
+                      : ((data.details as any).preferred_jobs ?? []).map((j: string) => <Badge key={j} variant="secondary">{j}</Badge>)}
+                  </div>
+                </div>
+                <div className="sm:col-span-2 md:col-span-3">
+                  <div className="text-[11px] uppercase tracking-wide text-muted-foreground">Why work abroad</div>
+                  <div className="whitespace-pre-wrap">{(data.details as any).reason_for_abroad ?? "—"}</div>
+                </div>
+              </div>
+            ) : <div className="text-sm text-muted-foreground">No registration form submitted yet.</div>}
+          </Section>
+          {app && (
+            <Section title="Application status">
+              <StatusControls app={app} onChange={refetch}/>
+            </Section>
+          )}
+        </TabsContent>
 
-      {app && (
-        <Section title="Admin notes">
-          <AdminNotes app={app} onSaved={() => qc.invalidateQueries({ queryKey: ["admin-applicant-full", id] })}/>
-        </Section>
-      )}
+        <TabsContent value="documents" className="mt-4">
+          <Section title={`Documents (${data.docs.length})`}>
+            {data.docs.length === 0 ? <div className="text-sm text-muted-foreground">No documents uploaded.</div> : (
+              <ul className="text-sm space-y-1">{data.docs.map((d: any) => (
+                <li key={d.id} className="flex justify-between border-b border-border py-1.5">
+                  <span><b>{d.type}</b> · {d.file_name ?? d.file_path}</span>
+                  <Badge variant={d.status === "approved" ? "default" : d.status === "rejected" ? "destructive" : "secondary"}>{d.status}</Badge>
+                </li>
+              ))}</ul>
+            )}
+          </Section>
+        </TabsContent>
+
+        <TabsContent value="payments" className="mt-4 space-y-4">
+          <Section title={`Payments (${data.pays.length})`}>
+            {data.pays.length === 0 ? <div className="text-sm text-muted-foreground">No payments recorded.</div> : (
+              <div className="space-y-1.5 text-sm">{data.pays.map((x: any) => (
+                <div key={x.id} className="flex justify-between border-b border-border py-1.5">
+                  <span>{x.currency} {Number(x.amount).toLocaleString()} · {x.service_description ?? x.payment_type} · {x.method ?? "—"}</span>
+                  <Badge variant={x.status === "verified" || x.status === "paid" ? "default" : "secondary"}>{x.status === "verified" || x.status === "paid" ? "Paid" : x.status}</Badge>
+                </div>
+              ))}</div>
+            )}
+          </Section>
+          <Section title={`Invoices (${data.invs.length})`}>
+            {data.invs.length === 0 ? <div className="text-sm text-muted-foreground">No invoices issued.</div> : (
+              <div className="space-y-1.5 text-sm">{data.invs.map((x: any) => (
+                <div key={x.id} className="flex justify-between border-b border-border py-1.5">
+                  <span><b>{x.invoice_number}</b> · {x.service} · Due UGX {Number(x.amount_due).toLocaleString()} · Paid UGX {Number(x.amount_paid).toLocaleString()}</span>
+                  <Badge variant={x.status==="paid"?"default":x.status==="cancelled"?"outline":"secondary"}>{x.status}</Badge>
+                </div>
+              ))}</div>
+            )}
+          </Section>
+        </TabsContent>
+
+        <TabsContent value="receipts" className="mt-4">
+          <Section title="Issued receipts">
+            <p className="text-xs text-muted-foreground mb-2">Every verified/paid payment is a receipt. Use the Receipts module for printable copies.</p>
+            {verifiedPays.length === 0 ? <div className="text-sm text-muted-foreground">No receipts yet.</div> : (
+              <div className="space-y-1.5 text-sm">{verifiedPays.map((x: any) => (
+                <div key={x.id} className="flex justify-between border-b border-border py-1.5">
+                  <span>R-{x.id.slice(0,8).toUpperCase()} · {x.currency} {Number(x.amount).toLocaleString()} · {x.service_description ?? x.payment_type}</span>
+                  <Link to="/admin/receipts" className="text-primary text-xs hover:underline">Open in Receipts →</Link>
+                </div>
+              ))}</div>
+            )}
+          </Section>
+        </TabsContent>
+
+        <TabsContent value="job" className="mt-4">
+          <Section title="Assigned job (visible to applicant)">
+            {app ? <JobAssignment app={app} jobs={data.jobs} onChange={refetch}/> : <div className="text-sm text-muted-foreground">No application record yet.</div>}
+          </Section>
+        </TabsContent>
+
+        <TabsContent value="reports" className="mt-4">
+          <Section title="Export applicant reports">
+            <p className="text-sm text-muted-foreground mb-3">Generate a professional PDF for employers, recruiters, embassies, partners or internal use.</p>
+            <ExportReportInline data={data}/>
+          </Section>
+        </TabsContent>
+
+        <TabsContent value="notes" className="mt-4">
+          <Section title="Internal admin notes">
+            {app ? <AdminNotes app={app} onSaved={refetch}/> : <div className="text-sm text-muted-foreground">No application yet.</div>}
+          </Section>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

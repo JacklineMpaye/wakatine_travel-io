@@ -8,7 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ArrowLeft, FileDown, Briefcase, Save, FileText, Printer } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { ArrowLeft, FileDown, Briefcase, Save, FileText, Printer, Upload } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -30,6 +31,7 @@ const STATUS_LABEL: Record<string, string> = {
 function ApplicantProfile() {
   const { id } = useParams({ from: "/_authenticated/admin/applicants/$id" });
   const qc = useQueryClient();
+  const refetch = () => qc.invalidateQueries({ queryKey: ["admin-applicant-full", id] });
   const { data, isLoading } = useQuery({
     queryKey: ["admin-applicant-full", id],
     queryFn: async () => {
@@ -56,9 +58,10 @@ function ApplicantProfile() {
   const app = data.apps[0]; // primary application
   const totalPaid = data.pays.filter((x: any) => x.status === "verified" || x.status === "paid").reduce((s: number, x: any) => s + Number(x.amount), 0);
   const totalOwed = data.invs.reduce((s: number, x: any) => s + Number(x.balance), 0);
+  const verifiedPays = data.pays.filter((x: any) => x.status === "verified" || x.status === "paid");
 
   return (
-    <div className="space-y-6 max-w-5xl">
+    <div className="space-y-6 max-w-6xl">
       <div className="flex justify-between flex-wrap gap-3 items-start">
         <div>
           <Link to="/admin/applicants" className="text-xs text-muted-foreground hover:text-primary inline-flex items-center gap-1"><ArrowLeft className="w-3 h-3"/>Back to applicants</Link>
@@ -69,9 +72,7 @@ function ApplicantProfile() {
           </h1>
           <p className="text-muted-foreground">{p.email ?? "—"} · {p.phone ?? "—"}</p>
         </div>
-        <div className="flex gap-2 flex-wrap">
-          <ExportReportButton data={data} />
-        </div>
+        <div className="flex gap-2 flex-wrap"><ExportReportButton data={data}/></div>
       </div>
 
       <div className="grid sm:grid-cols-3 gap-3">
@@ -80,83 +81,143 @@ function ApplicantProfile() {
         <Card className="p-4"><div className="text-xs uppercase tracking-widest text-muted-foreground">Application status</div><div className="text-xl font-bold">{app ? STATUS_LABEL[app.status] : "—"}</div></Card>
       </div>
 
-      <Section title="Personal details">
-        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 text-sm">
-          <Field label="Full name" value={p.full_name}/>
-          <Field label="Date of birth" value={p.date_of_birth}/>
-          <Field label="Gender" value={p.gender}/>
-          <Field label="Nationality" value={p.nationality}/>
-          <Field label="District" value={p.district}/>
-          <Field label="Address" value={p.address}/>
-          <Field label="Profession" value={p.profession}/>
-          <Field label="Years experience" value={p.years_experience}/>
-          <Field label="Education" value={p.education_level}/>
-        </div>
-      </Section>
+      <Tabs defaultValue="profile" className="w-full">
+        <TabsList className="flex flex-wrap h-auto">
+          <TabsTrigger value="profile">Profile</TabsTrigger>
+          <TabsTrigger value="application">Application</TabsTrigger>
+          <TabsTrigger value="documents">Documents ({data.docs.length})</TabsTrigger>
+          <TabsTrigger value="payments">Payments ({data.pays.length})</TabsTrigger>
+          <TabsTrigger value="receipts">Receipts ({verifiedPays.length})</TabsTrigger>
+          <TabsTrigger value="job">Assigned Job</TabsTrigger>
+          <TabsTrigger value="reports">Reports</TabsTrigger>
+          <TabsTrigger value="notes">Notes</TabsTrigger>
+        </TabsList>
 
-      <Section title="Application details">
-        {data.details ? (
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 text-sm">
-            <Field label="NIN" value={data.details.nin}/>
-            <Field label="Passport #" value={data.details.passport_number}/>
-            <Field label="Has passport" value={data.details.has_passport === null ? "—" : data.details.has_passport ? "Yes" : "No"}/>
-            <Field label="Village" value={data.details.village}/>
-            <Field label="Father status" value={data.details.father_status}/>
-            <Field label="Mother status" value={data.details.mother_status}/>
-            <Field label="Next of kin" value={data.details.next_of_kin_name}/>
-            <Field label="Next of kin phone" value={data.details.next_of_kin_phone}/>
-            <Field label="Relationship" value={data.details.next_of_kin_relationship}/>
-            <Field label="Desired job" value={data.details.desired_job}/>
-            <Field label="Expected salary" value={data.details.salary_expectation_ugx ? `UGX ${Number(data.details.salary_expectation_ugx).toLocaleString()}` : null}/>
-            <Field label="Submitted" value={data.details.submitted ? "Yes" : "No"}/>
-          </div>
-        ) : <div className="text-sm text-muted-foreground">No registration form submitted yet.</div>}
-      </Section>
-
-      {app && (
-        <Section title="Application status & job assignment">
-          <ApplicationControls app={app} jobs={data.jobs} onChange={() => qc.invalidateQueries({ queryKey: ["admin-applicant-full", id] })}/>
-        </Section>
-      )}
-
-      <Section title={`Documents (${data.docs.length})`}>
-        {data.docs.length === 0 ? <div className="text-sm text-muted-foreground">No documents uploaded.</div> : (
-          <ul className="text-sm space-y-1">{data.docs.map((d: any) => (
-            <li key={d.id} className="flex justify-between border-b border-border py-1.5">
-              <span><b>{d.type}</b> · {d.file_name ?? d.file_path}</span>
-              <Badge variant={d.status === "approved" ? "default" : d.status === "rejected" ? "destructive" : "secondary"}>{d.status}</Badge>
-            </li>
-          ))}</ul>
-        )}
-      </Section>
-
-      <Section title={`Payments (${data.pays.length})`}>
-        {data.pays.length === 0 ? <div className="text-sm text-muted-foreground">No payments recorded.</div> : (
-          <div className="space-y-1.5 text-sm">{data.pays.map((x: any) => (
-            <div key={x.id} className="flex justify-between border-b border-border py-1.5">
-              <span>{x.currency} {Number(x.amount).toLocaleString()} · {x.service_description ?? x.payment_type} · {x.method ?? "—"}</span>
-              <Badge variant={x.status === "verified" || x.status === "paid" ? "default" : "secondary"}>{x.status === "verified" || x.status === "paid" ? "Paid" : x.status}</Badge>
+        <TabsContent value="profile" className="mt-4">
+          <Section title="Biodata">
+            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 text-sm">
+              <Field label="Full name" value={p.full_name}/>
+              <Field label="Date of birth" value={p.date_of_birth}/>
+              <Field label="Gender" value={p.gender}/>
+              <Field label="Nationality" value={p.nationality}/>
+              <Field label="District" value={p.district}/>
+              <Field label="Address" value={p.address}/>
+              <Field label="Profession" value={p.profession}/>
+              <Field label="Years experience" value={p.years_experience}/>
+              <Field label="Education" value={p.education_level}/>
+              <Field label="Phone" value={p.phone}/>
+              <Field label="Email" value={p.email}/>
             </div>
-          ))}</div>
-        )}
-      </Section>
+          </Section>
+        </TabsContent>
 
-      <Section title={`Invoices (${data.invs.length})`}>
-        {data.invs.length === 0 ? <div className="text-sm text-muted-foreground">No invoices issued.</div> : (
-          <div className="space-y-1.5 text-sm">{data.invs.map((x: any) => (
-            <div key={x.id} className="flex justify-between border-b border-border py-1.5">
-              <span><b>{x.invoice_number}</b> · {x.service} · Due UGX {Number(x.amount_due).toLocaleString()} · Paid UGX {Number(x.amount_paid).toLocaleString()}</span>
-              <Badge variant={x.status==="paid"?"default":x.status==="cancelled"?"outline":"secondary"}>{x.status}</Badge>
-            </div>
-          ))}</div>
-        )}
-      </Section>
+        <TabsContent value="application" className="mt-4 space-y-4">
+          <Section title="Registration form">
+            {data.details ? (
+              <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 text-sm">
+                <Field label="NIN" value={data.details.nin}/>
+                <Field label="Passport #" value={data.details.passport_number}/>
+                <Field label="Has passport" value={data.details.has_passport === null ? "—" : data.details.has_passport ? "Yes" : "No"}/>
+                <Field label="Village" value={data.details.village}/>
+                <Field label="Father status" value={data.details.father_status}/>
+                <Field label="Mother status" value={data.details.mother_status}/>
+                <Field label="Next of kin" value={data.details.next_of_kin_name}/>
+                <Field label="Next of kin phone" value={data.details.next_of_kin_phone}/>
+                <Field label="Relationship" value={data.details.next_of_kin_relationship}/>
+                <Field label="Primary desired job" value={data.details.desired_job}/>
+                <Field label="Expected salary" value={data.details.salary_expectation_ugx ? `UGX ${Number(data.details.salary_expectation_ugx).toLocaleString()}` : null}/>
+                <Field label="Submitted" value={data.details.submitted ? "Yes" : "No"}/>
+                <div className="sm:col-span-2 md:col-span-3">
+                  <div className="text-[11px] uppercase tracking-wide text-muted-foreground">Preferred jobs</div>
+                  <div className="flex flex-wrap gap-1.5 mt-1">
+                    {((data.details as any).preferred_jobs ?? []).length === 0
+                      ? <span className="text-muted-foreground">—</span>
+                      : ((data.details as any).preferred_jobs ?? []).map((j: string) => <Badge key={j} variant="secondary">{j}</Badge>)}
+                  </div>
+                </div>
+                <div className="sm:col-span-2 md:col-span-3">
+                  <div className="text-[11px] uppercase tracking-wide text-muted-foreground">Why work abroad</div>
+                  <div className="whitespace-pre-wrap">{(data.details as any).reason_for_abroad ?? "—"}</div>
+                </div>
+              </div>
+            ) : <div className="text-sm text-muted-foreground">No registration form submitted yet.</div>}
+          </Section>
+          {app && (
+            <Section title="Application status">
+              <StatusControls app={app} onChange={refetch}/>
+            </Section>
+          )}
+        </TabsContent>
 
-      {app && (
-        <Section title="Admin notes">
-          <AdminNotes app={app} onSaved={() => qc.invalidateQueries({ queryKey: ["admin-applicant-full", id] })}/>
-        </Section>
-      )}
+        <TabsContent value="documents" className="mt-4">
+          <Section title={`Documents (${data.docs.length})`}>
+            {data.docs.length === 0 ? <div className="text-sm text-muted-foreground">No documents uploaded.</div> : (
+              <ul className="text-sm space-y-1">{data.docs.map((d: any) => (
+                <li key={d.id} className="flex justify-between border-b border-border py-1.5">
+                  <span><b>{d.type}</b> · {d.file_name ?? d.file_path}</span>
+                  <Badge variant={d.status === "approved" ? "default" : d.status === "rejected" ? "destructive" : "secondary"}>{d.status}</Badge>
+                </li>
+              ))}</ul>
+            )}
+          </Section>
+        </TabsContent>
+
+        <TabsContent value="payments" className="mt-4 space-y-4">
+          <Section title={`Payments (${data.pays.length})`}>
+            {data.pays.length === 0 ? <div className="text-sm text-muted-foreground">No payments recorded.</div> : (
+              <div className="space-y-1.5 text-sm">{data.pays.map((x: any) => (
+                <div key={x.id} className="flex justify-between border-b border-border py-1.5">
+                  <span>{x.currency} {Number(x.amount).toLocaleString()} · {x.service_description ?? x.payment_type} · {x.method ?? "—"}</span>
+                  <Badge variant={x.status === "verified" || x.status === "paid" ? "default" : "secondary"}>{x.status === "verified" || x.status === "paid" ? "Paid" : x.status}</Badge>
+                </div>
+              ))}</div>
+            )}
+          </Section>
+          <Section title={`Invoices (${data.invs.length})`}>
+            {data.invs.length === 0 ? <div className="text-sm text-muted-foreground">No invoices issued.</div> : (
+              <div className="space-y-1.5 text-sm">{data.invs.map((x: any) => (
+                <div key={x.id} className="flex justify-between border-b border-border py-1.5">
+                  <span><b>{x.invoice_number}</b> · {x.service} · Due UGX {Number(x.amount_due).toLocaleString()} · Paid UGX {Number(x.amount_paid).toLocaleString()}</span>
+                  <Badge variant={x.status==="paid"?"default":x.status==="cancelled"?"outline":"secondary"}>{x.status}</Badge>
+                </div>
+              ))}</div>
+            )}
+          </Section>
+        </TabsContent>
+
+        <TabsContent value="receipts" className="mt-4">
+          <Section title="Issued receipts">
+            <p className="text-xs text-muted-foreground mb-2">Every verified/paid payment is a receipt. Use the Receipts module for printable copies.</p>
+            {verifiedPays.length === 0 ? <div className="text-sm text-muted-foreground">No receipts yet.</div> : (
+              <div className="space-y-1.5 text-sm">{verifiedPays.map((x: any) => (
+                <div key={x.id} className="flex justify-between border-b border-border py-1.5">
+                  <span>R-{x.id.slice(0,8).toUpperCase()} · {x.currency} {Number(x.amount).toLocaleString()} · {x.service_description ?? x.payment_type}</span>
+                  <Link to="/admin/receipts" className="text-primary text-xs hover:underline">Open in Receipts →</Link>
+                </div>
+              ))}</div>
+            )}
+          </Section>
+        </TabsContent>
+
+        <TabsContent value="job" className="mt-4">
+          <Section title="Assigned job (visible to applicant)">
+            {app ? <JobAssignment app={app} jobs={data.jobs} onChange={refetch}/> : <div className="text-sm text-muted-foreground">No application record yet.</div>}
+          </Section>
+        </TabsContent>
+
+        <TabsContent value="reports" className="mt-4">
+          <Section title="Export applicant reports">
+            <p className="text-sm text-muted-foreground mb-3">Generate a professional PDF for employers, recruiters, embassies, partners or internal use.</p>
+            <ExportReportInline data={data}/>
+          </Section>
+        </TabsContent>
+
+        <TabsContent value="notes" className="mt-4">
+          <Section title="Internal admin notes">
+            {app ? <AdminNotes app={app} onSaved={refetch}/> : <div className="text-sm text-muted-foreground">No application yet.</div>}
+          </Section>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
@@ -178,59 +239,138 @@ function Field({ label, value }: { label: string; value: any }) {
   );
 }
 
-function ApplicationControls({ app, jobs, onChange }: { app: any; jobs: any[]; onChange: () => void }) {
+function StatusControls({ app, onChange }: { app: any; onChange: () => void }) {
   const [status, setStatus] = useState(app.status);
-  const [jobId, setJobId] = useState(app.job_id ?? "");
-  const [customTitle, setCustomTitle] = useState(app.assigned_job_title ?? "");
-  const [customCountry, setCustomCountry] = useState(app.assigned_job_country ?? "");
-  const [customDesc, setCustomDesc] = useState(app.assigned_job_description ?? "");
-
   const saveStatus = async () => {
     const { error } = await supabase.from("applications").update({ status: status as any }).eq("id", app.id);
     if (error) return toast.error(error.message);
     toast.success("Status updated — applicant notified"); onChange();
   };
-  const saveJob = async () => {
+  return (
+    <div className="flex flex-wrap gap-2 items-end">
+      <div className="flex-1 min-w-[220px]">
+        <Label>Status</Label>
+        <select className="h-10 px-3 rounded-md border border-input bg-background w-full" value={status} onChange={(e)=>setStatus(e.target.value)}>
+          {STATUSES.map((s) => <option key={s} value={s}>{STATUS_LABEL[s]}</option>)}
+        </select>
+      </div>
+      <Button onClick={saveStatus}><Save className="w-4 h-4 mr-1"/>Update status</Button>
+    </div>
+  );
+}
+
+function JobAssignment({ app, jobs, onChange }: { app: any; jobs: any[]; onChange: () => void }) {
+  const [jobId, setJobId] = useState(app.job_id ?? "");
+  const [title, setTitle] = useState(app.assigned_job_title ?? "");
+  const [country, setCountry] = useState(app.assigned_job_country ?? "");
+  const [employer, setEmployer] = useState(app.assigned_job_employer ?? "");
+  const [salary, setSalary] = useState(app.assigned_job_salary ?? "");
+  const [benefits, setBenefits] = useState(app.assigned_job_benefits ?? "");
+  const [contract, setContract] = useState(app.assigned_job_contract_duration ?? "");
+  const [desc, setDesc] = useState(app.assigned_job_description ?? "");
+  const [jdFile, setJdFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+
+  // Prefill from selected catalogue job
+  const onPickJob = (id: string) => {
+    setJobId(id);
+    const j = jobs.find((x) => x.id === id);
+    if (j) {
+      if (!title) setTitle(j.title ?? "");
+      if (!country) setCountry(j.country ?? "");
+      if (!employer) setEmployer(j.employer ?? "");
+    }
+  };
+
+  const save = async () => {
+    setUploading(true);
+    let jdPath = app.assigned_job_description_path ?? null;
+    if (jdFile) {
+      const path = `${app.applicant_id}/job-description-${Date.now()}-${jdFile.name}`;
+      const { error: upErr } = await supabase.storage.from("applicant-documents").upload(path, jdFile, { upsert: true });
+      if (upErr) { setUploading(false); return toast.error(upErr.message); }
+      jdPath = path;
+    }
     const payload: any = {
-      job_id: jobId || app.job_id,
-      assigned_job_title: customTitle || null,
-      assigned_job_country: customCountry || null,
-      assigned_job_description: customDesc || null,
+      job_id: jobId || null,
+      assigned_job_title: title || null,
+      assigned_job_country: country || null,
+      assigned_job_employer: employer || null,
+      assigned_job_salary: salary || null,
+      assigned_job_benefits: benefits || null,
+      assigned_job_contract_duration: contract || null,
+      assigned_job_description: desc || null,
+      assigned_job_description_path: jdPath,
     };
     const { error } = await supabase.from("applications").update(payload).eq("id", app.id);
+    setUploading(false);
     if (error) return toast.error(error.message);
-    toast.success("Job assignment saved"); onChange();
+    setJdFile(null);
+    toast.success("Assignment saved — visible on applicant dashboard");
+    onChange();
   };
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap gap-2 items-end">
-        <div className="flex-1 min-w-[220px]">
-          <Label>Status</Label>
-          <select className="h-10 px-3 rounded-md border border-input bg-background w-full" value={status} onChange={(e)=>setStatus(e.target.value)}>
-            {STATUSES.map((s) => <option key={s} value={s}>{STATUS_LABEL[s]}</option>)}
-          </select>
-        </div>
-        <Button onClick={saveStatus}><Save className="w-4 h-4 mr-1"/>Update status</Button>
+      <div>
+        <Label>Pick from job catalogue</Label>
+        <select className="h-10 px-3 rounded-md border border-input bg-background w-full" value={jobId} onChange={(e)=>onPickJob(e.target.value)}>
+          <option value="">— None / custom assignment —</option>
+          {jobs.map((j: any) => <option key={j.id} value={j.id}>{j.title} · {j.country}{j.employer ? ` · ${j.employer}` : ""}</option>)}
+        </select>
+        <p className="text-xs text-muted-foreground mt-1">Picking a job auto-fills the fields below — you can still override them.</p>
       </div>
-      <div className="border-t border-border pt-4">
-        <div className="flex items-center gap-2 mb-2"><Briefcase className="w-4 h-4 text-primary"/><span className="font-semibold text-sm">Assigned job</span></div>
-        <div className="grid sm:grid-cols-2 gap-3">
-          <div>
-            <Label>Select from catalogue</Label>
-            <select className="h-10 px-3 rounded-md border border-input bg-background w-full" value={jobId} onChange={(e)=>setJobId(e.target.value)}>
-              <option value="">— None —</option>
-              {jobs.map((j: any) => <option key={j.id} value={j.id}>{j.title} · {j.country}</option>)}
-            </select>
-          </div>
+      <div className="grid sm:grid-cols-2 gap-3">
+        <div><Label>Job title *</Label><Input value={title} onChange={(e)=>setTitle(e.target.value)} placeholder="e.g. Hotel Cleaner"/></div>
+        <div><Label>Country *</Label><Input value={country} onChange={(e)=>setCountry(e.target.value)} placeholder="e.g. UAE"/></div>
+        <div><Label>Employer</Label><Input value={employer} onChange={(e)=>setEmployer(e.target.value)} placeholder="e.g. Al Habtoor Hotels"/></div>
+        <div><Label>Salary</Label><Input value={salary} onChange={(e)=>setSalary(e.target.value)} placeholder="e.g. AED 1,500/month + tips"/></div>
+        <div><Label>Contract duration</Label><Input value={contract} onChange={(e)=>setContract(e.target.value)} placeholder="e.g. 2 years renewable"/></div>
+        <div><Label>Benefits</Label><Input value={benefits} onChange={(e)=>setBenefits(e.target.value)} placeholder="Food, accommodation, transport, medical…"/></div>
+        <div className="sm:col-span-2"><Label>Job description</Label><Textarea rows={5} value={desc} onChange={(e)=>setDesc(e.target.value)} placeholder="Paste or type the full job description (will be included in the exported report)…"/></div>
+        <div className="sm:col-span-2">
+          <Label>Or upload a job-description document</Label>
+          <label className="flex items-center gap-3 p-3 border border-dashed border-input rounded-lg cursor-pointer hover:bg-muted/40">
+            <Upload className="w-5 h-5 text-primary"/>
+            <span className="text-sm">{jdFile ? jdFile.name : app.assigned_job_description_path ? `Current: ${(app.assigned_job_description_path as string).split("/").pop()}` : "Tap to choose a PDF/DOCX/image"}</span>
+            <input type="file" accept=".pdf,.doc,.docx,image/*" className="hidden" onChange={(e)=>setJdFile(e.target.files?.[0] ?? null)}/>
+          </label>
         </div>
-        <div className="text-xs text-muted-foreground my-2">— or override with a custom assignment —</div>
-        <div className="grid sm:grid-cols-2 gap-3">
-          <div><Label>Custom title</Label><Input value={customTitle} onChange={(e)=>setCustomTitle(e.target.value)} placeholder="e.g. Hotel Cleaner"/></div>
-          <div><Label>Country</Label><Input value={customCountry} onChange={(e)=>setCustomCountry(e.target.value)} placeholder="e.g. UAE"/></div>
-          <div className="sm:col-span-2"><Label>Job description</Label><Textarea rows={4} value={customDesc} onChange={(e)=>setCustomDesc(e.target.value)} placeholder="Paste or type the job description that will appear on the exported report…"/></div>
+      </div>
+      <Button onClick={save} disabled={uploading}><Save className="w-4 h-4 mr-1"/>{uploading ? "Saving…" : "Save assignment"}</Button>
+    </div>
+  );
+}
+
+function ExportReportInline({ data }: { data: any }) {
+  const [type, setType] = useState<"biodata"|"full">("biodata");
+  const [jobDescOverride, setJobDescOverride] = useState("");
+  const generate = (print: boolean) => {
+    const html = buildReportHtml(data, type, jobDescOverride);
+    const w = window.open("", "_blank");
+    if (!w) return;
+    w.document.write(html); w.document.close();
+    if (print) setTimeout(() => w.print(), 400);
+  };
+  return (
+    <div className="space-y-3 max-w-2xl">
+      <div>
+        <Label>Report type</Label>
+        <div className="grid grid-cols-2 gap-2 mt-1">
+          <Button type="button" variant={type==="biodata"?"default":"outline"} size="sm" onClick={()=>setType("biodata")}>Biodata Summary</Button>
+          <Button type="button" variant={type==="full"?"default":"outline"} size="sm" onClick={()=>setType("full")}>Full Application</Button>
         </div>
-        <Button className="mt-3" onClick={saveJob}><Save className="w-4 h-4 mr-1"/>Save assignment</Button>
+        <p className="text-xs text-muted-foreground mt-1">
+          {type === "biodata" ? "Personal & contact details, preferred jobs, assigned job, current status." : "Entire registration form: personal, family, education, employment, preferred jobs, assigned job, status."}
+        </p>
+      </div>
+      <div>
+        <Label>Extra job description (optional override)</Label>
+        <Textarea rows={4} value={jobDescOverride} onChange={(e)=>setJobDescOverride(e.target.value)} placeholder="Leave blank to use the saved assigned-job description."/>
+      </div>
+      <div className="flex gap-2">
+        <Button className="flex-1" onClick={()=>generate(false)}><FileText className="w-4 h-4 mr-1"/>Preview</Button>
+        <Button className="flex-1 bg-gradient-primary" onClick={()=>generate(true)}><Printer className="w-4 h-4 mr-1"/>Print / PDF</Button>
       </div>
     </div>
   );
@@ -297,7 +437,13 @@ function buildReportHtml(data: any, type: "biodata"|"full", jobDescOverride: str
   const job = app?.jobs;
   const assignedTitle = app?.assigned_job_title || job?.title || d.desired_job || "—";
   const assignedCountry = app?.assigned_job_country || job?.country || "—";
+  const assignedEmployer = app?.assigned_job_employer || job?.employer || "—";
+  const assignedSalary = app?.assigned_job_salary || "—";
+  const assignedBenefits = app?.assigned_job_benefits || "—";
+  const assignedContract = app?.assigned_job_contract_duration || "—";
   const jobDesc = jobDescOverride.trim() || app?.assigned_job_description || "";
+  const preferredJobs: string[] = (d.preferred_jobs ?? []) as string[];
+  const reason: string = (d.reason_for_abroad ?? "") as string;
   const reportTitle = type === "biodata" ? "BIODATA SUMMARY" : "FULL APPLICATION REPORT";
 
   const row = (k: string, v: any) => `<tr><th>${k}</th><td>${v ?? "—"}</td></tr>`;
@@ -334,26 +480,39 @@ function buildReportHtml(data: any, type: "biodata"|"full", jobDescOverride: str
     ${row("Profession", p.profession)}
     ${row("Years of experience", p.years_experience)}
     ${row("Education level", p.education_level)}
-    ${row("Desired job", d.desired_job)}
+    ${row("Primary desired job", d.desired_job)}
+    ${row("Other preferred jobs", preferredJobs.length ? preferredJobs.join(", ") : null)}
     ${row("Expected salary (UGX)", d.salary_expectation_ugx ? Number(d.salary_expectation_ugx).toLocaleString() : null)}
+    ${row("Why work abroad", reason ? reason.replace(/\n/g,"<br/>") : null)}
   </table>`;
 
-  const application = `<h2>Application</h2><table class="info">
-    ${row("Assigned job", assignedTitle)}
+  const preferredBlock = `<h2>Preferred Jobs (Applicant)</h2><table class="info">
+    ${row("Primary desired", d.desired_job)}
+    ${row("Also willing to do", preferredJobs.length ? preferredJobs.join(", ") : null)}
+    ${row("Expected salary (UGX/mo)", d.salary_expectation_ugx ? Number(d.salary_expectation_ugx).toLocaleString() : null)}
+    ${row("Why work abroad", reason ? reason.replace(/\n/g,"<br/>") : null)}
+  </table>`;
+
+  const application = `<h2>Assigned Job (Wakatine)</h2><table class="info">
+    ${row("Job title", assignedTitle)}
     ${row("Country", assignedCountry)}
-    ${row("Employer", job?.employer)}
-    ${row("Status", app ? (app.status as string).replace(/_/g," ").toUpperCase() : "—")}
+    ${row("Employer", assignedEmployer)}
+    ${row("Salary", assignedSalary)}
+    ${row("Contract duration", assignedContract)}
+    ${row("Benefits", assignedBenefits)}
+    ${row("Application status", app ? (app.status as string).replace(/_/g," ").toUpperCase() : "—")}
   </table>`;
 
   const jobBlock = (assignedTitle !== "—" || jobDesc) ? `<h2>Job Description</h2>
     <div class="job">
       <div class="job-head"><b>${assignedTitle}</b>${assignedCountry && assignedCountry !== "—" ? ` &mdash; ${assignedCountry}` : ""}</div>
       ${jobDesc ? `<div class="job-desc">${jobDesc.replace(/\n/g, "<br/>")}</div>` : `<div class="job-desc" style="color:#999">No description attached.</div>`}
+      ${app?.assigned_job_description_path ? `<div class="job-desc" style="margin-top:8px;color:#666;font-size:11px"><em>An additional job-description document is on file: ${(app.assigned_job_description_path as string).split("/").pop()}</em></div>` : ""}
     </div>` : "";
 
   const body = type === "biodata"
-    ? `${personal}${application}${jobBlock}`
-    : `${personal}${identity}${family}${employment}${application}${jobBlock}`;
+    ? `${personal}${preferredBlock}${application}${jobBlock}`
+    : `${personal}${identity}${family}${employment}${preferredBlock}${application}${jobBlock}`;
 
   return `<!doctype html><html><head><title>${reportTitle} · ${p.full_name ?? p.applicant_code}</title>
 <style>

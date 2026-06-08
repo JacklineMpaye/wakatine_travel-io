@@ -36,6 +36,8 @@ export type Database = {
           passport_number: string | null
           passport_photo_path: string | null
           phone: string | null
+          preferred_jobs: string[] | null
+          reason_for_abroad: string | null
           salary_expectation_ugx: number | null
           submitted: boolean
           updated_at: string
@@ -63,6 +65,8 @@ export type Database = {
           passport_number?: string | null
           passport_photo_path?: string | null
           phone?: string | null
+          preferred_jobs?: string[] | null
+          reason_for_abroad?: string | null
           salary_expectation_ugx?: number | null
           submitted?: boolean
           updated_at?: string
@@ -90,6 +94,8 @@ export type Database = {
           passport_number?: string | null
           passport_photo_path?: string | null
           phone?: string | null
+          preferred_jobs?: string[] | null
+          reason_for_abroad?: string | null
           salary_expectation_ugx?: number | null
           submitted?: boolean
           updated_at?: string
@@ -137,8 +143,13 @@ export type Database = {
         Row: {
           admin_notes: string | null
           applicant_id: string
+          assigned_job_benefits: string | null
+          assigned_job_contract_duration: string | null
           assigned_job_country: string | null
           assigned_job_description: string | null
+          assigned_job_description_path: string | null
+          assigned_job_employer: string | null
+          assigned_job_salary: string | null
           assigned_job_title: string | null
           cover_letter: string | null
           created_at: string
@@ -150,8 +161,13 @@ export type Database = {
         Insert: {
           admin_notes?: string | null
           applicant_id: string
+          assigned_job_benefits?: string | null
+          assigned_job_contract_duration?: string | null
           assigned_job_country?: string | null
           assigned_job_description?: string | null
+          assigned_job_description_path?: string | null
+          assigned_job_employer?: string | null
+          assigned_job_salary?: string | null
           assigned_job_title?: string | null
           cover_letter?: string | null
           created_at?: string
@@ -163,8 +179,13 @@ export type Database = {
         Update: {
           admin_notes?: string | null
           applicant_id?: string
+          assigned_job_benefits?: string | null
+          assigned_job_contract_duration?: string | null
           assigned_job_country?: string | null
           assigned_job_description?: string | null
+          assigned_job_description_path?: string | null
+          assigned_job_employer?: string | null
+          assigned_job_salary?: string | null
           assigned_job_title?: string | null
           cover_letter?: string | null
           created_at?: string

@@ -9,7 +9,8 @@ import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { ChevronLeft, ChevronRight, CheckCircle2, AlertTriangle, Upload, Circle, Clock, Pencil } from "lucide-react";
+import { ChevronLeft, ChevronRight, CheckCircle2, AlertTriangle, Upload, Circle, Clock, Pencil, Briefcase } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 
 export const Route = createFileRoute("/_authenticated/my-application")({ component: MyApplication });
 
@@ -24,9 +25,9 @@ const STAGE_LABEL: Record<string,string> = {
 };
 
 const UAE_JOBS = [
-  "Cleaner","Security Guard","Driver","House Maid","Hotel Attendant","Waiter/Waitress",
-  "Kitchen Helper","Chef Assistant","Laundry Attendant","Construction Worker","Caregiver",
-  "Barber","Salon Worker","Packing Worker","Office Cleaner",
+  "Driver","Cleaner","House Maid","Security Guard","Hotel Attendant","Caregiver",
+  "Waiter/Waitress","Kitchen Helper","Chef Assistant","Laundry Attendant",
+  "Construction Worker","Barber","Salon Worker","Packing Worker","Office Cleaner",
 ];
 
 const NIN_ISSUES = [
@@ -46,7 +47,8 @@ type Form = {
   father_status: string; mother_status: string;
   next_of_kin_name: string; next_of_kin_phone: string; next_of_kin_relationship: string;
   has_passport: "" | "yes" | "no"; passport_number: string;
-  desired_job: string; salary_expectation_ugx: string; nin_issue: string;
+  desired_job: string; preferred_jobs: string[]; reason_for_abroad: string;
+  salary_expectation_ugx: string; nin_issue: string;
 };
 
 const STEPS = ["Personal", "Family", "Documents", "Job", "Review"];
@@ -58,7 +60,7 @@ function MyApplication() {
   const [savedId, setSavedId] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [editing, setEditing] = useState(false);
-  const [tracker, setTracker] = useState<{ status: string; admin_notes: string | null } | null>(null);
+  const [tracker, setTracker] = useState<any | null>(null);
   const [passportFile, setPassportFile] = useState<File | null>(null);
   const [f, setF] = useState<Form>({
     full_name: "", date_of_birth: "", gender: "", phone: "", email: user?.email ?? "",
@@ -66,7 +68,8 @@ function MyApplication() {
     father_status: "", mother_status: "",
     next_of_kin_name: "", next_of_kin_phone: "", next_of_kin_relationship: "",
     has_passport: "", passport_number: "",
-    desired_job: "", salary_expectation_ugx: "", nin_issue: "no_issues",
+    desired_job: "", preferred_jobs: [], reason_for_abroad: "",
+    salary_expectation_ugx: "", nin_issue: "no_issues",
   });
 
   // Load existing draft
@@ -87,16 +90,19 @@ function MyApplication() {
           next_of_kin_relationship: data.next_of_kin_relationship ?? "",
           has_passport: data.has_passport === null ? "" : data.has_passport ? "yes" : "no",
           passport_number: data.passport_number ?? "",
-          desired_job: data.desired_job ?? "", salary_expectation_ugx: data.salary_expectation_ugx?.toString() ?? "",
+          desired_job: data.desired_job ?? "",
+          preferred_jobs: (data as any).preferred_jobs ?? [],
+          reason_for_abroad: (data as any).reason_for_abroad ?? "",
+          salary_expectation_ugx: data.salary_expectation_ugx?.toString() ?? "",
           nin_issue: data.nin_issue ?? "no_issues",
         }));
       }
-      const { data: app } = await supabase.from("applications").select("status, admin_notes").eq("applicant_id", user.id).order("created_at", { ascending: false }).limit(1).maybeSingle();
-      if (app) setTracker({ status: app.status as string, admin_notes: (app.admin_notes as string | null) ?? null });
+      const { data: app } = await supabase.from("applications").select("*, jobs(title, country, employer)").eq("applicant_id", user.id).order("created_at", { ascending: false }).limit(1).maybeSingle();
+      if (app) setTracker(app);
     })();
   }, [user]);
 
-  const upd = (k: keyof Form, v: string) => setF({ ...f, [k]: v });
+  const upd = (k: keyof Form, v: any) => setF({ ...f, [k]: v });
 
   const save = async (markSubmitted = false): Promise<string | null> => {
     if (!user) return null;
@@ -111,11 +117,13 @@ function MyApplication() {
       has_passport: f.has_passport === "" ? null : f.has_passport === "yes",
       passport_number: f.has_passport === "yes" ? f.passport_number || null : null,
       desired_job: f.desired_job || null,
+      preferred_jobs: f.preferred_jobs ?? [],
+      reason_for_abroad: f.reason_for_abroad || null,
       salary_expectation_ugx: f.salary_expectation_ugx ? Number(f.salary_expectation_ugx) : null,
       nin_issue: f.nin_issue || "no_issues",
       submitted: markSubmitted || undefined,
     };
-    const { data, error } = await supabase.from("application_details").upsert(payload, { onConflict: "user_id" }).select().single();
+    const { data, error } = await supabase.from("application_details").upsert(payload as any, { onConflict: "user_id" }).select().single();
     if (error) { toast.error(error.message); return null; }
     setSavedId(data.id);
     return data.id;
@@ -146,7 +154,9 @@ function MyApplication() {
       if (f.has_passport === "yes" && !f.passport_number) return toast.error("Enter passport number");
     }
     if (step === 3) {
-      if (!f.desired_job || !f.salary_expectation_ugx) return toast.error("Choose a job and salary expectation");
+      if (!f.desired_job || !f.salary_expectation_ugx) return toast.error("Choose a primary desired job and salary expectation");
+      if (!f.preferred_jobs || f.preferred_jobs.length === 0) return toast.error("Pick at least one preferred job");
+      if (!f.reason_for_abroad.trim()) return toast.error("Tell us why you want to work abroad");
     }
     await save();
     setStep((s) => Math.min(s + 1, STEPS.length - 1));
@@ -235,9 +245,27 @@ function MyApplication() {
           <Review label="District / Village" v={`${f.district}${f.village ? ` · ${f.village}` : ""}`}/>
           <Review label="Next of Kin" v={`${f.next_of_kin_name} (${f.next_of_kin_relationship}) — ${f.next_of_kin_phone}`}/>
           <Review label="Passport" v={f.has_passport === "yes" ? `Yes — ${f.passport_number}` : "No (processing required)"}/>
-          <Review label="Desired Job" v={f.desired_job}/>
+          <Review label="Primary desired job" v={f.desired_job}/>
+          <Review label="Other preferred jobs" v={f.preferred_jobs?.join(", ") || "—"}/>
           <Review label="Salary expectation" v={f.salary_expectation_ugx ? `UGX ${Number(f.salary_expectation_ugx).toLocaleString()}` : "—"}/>
+          <Review label="Why work abroad" v={f.reason_for_abroad || "—"}/>
         </Card>
+        {tracker && (tracker.assigned_job_title || tracker.jobs?.title) && (
+          <Card className="p-6 border-primary/30">
+            <div className="flex items-center gap-2 mb-3"><Briefcase className="w-5 h-5 text-primary"/><h2 className="font-bold text-lg">Job assigned by Wakatine</h2></div>
+            <div className="grid sm:grid-cols-2 gap-3 text-sm">
+              <Review label="Job title" v={tracker.assigned_job_title || tracker.jobs?.title || "—"}/>
+              <Review label="Country" v={tracker.assigned_job_country || tracker.jobs?.country || "—"}/>
+              <Review label="Employer" v={tracker.assigned_job_employer || tracker.jobs?.employer || "—"}/>
+              <Review label="Salary" v={tracker.assigned_job_salary || "—"}/>
+              <Review label="Contract" v={tracker.assigned_job_contract_duration || "—"}/>
+              <Review label="Benefits" v={tracker.assigned_job_benefits || "—"}/>
+            </div>
+            {tracker.assigned_job_description && (
+              <div className="mt-3 p-3 bg-muted/50 rounded-lg text-sm whitespace-pre-wrap"><b>Description:</b> {tracker.assigned_job_description}</div>
+            )}
+          </Card>
+        )}
       </div>
     );
   }
@@ -332,14 +360,35 @@ function MyApplication() {
 
         {step === 3 && (
           <div className="space-y-4">
-            <Field label="Desired Job in UAE *">
+            <Field label="Primary desired job *" hint="The single job role you most want to do.">
               <select className="h-10 px-3 rounded-md border border-input bg-background w-full" value={f.desired_job} onChange={(e)=>upd("desired_job",e.target.value)}>
                 <option value="">Select a job…</option>
                 {UAE_JOBS.map((j)=><option key={j} value={j}>{j}</option>)}
               </select>
             </Field>
+            <Field label="Other preferred jobs *" hint="Tick every role you'd accept. Recruiters will see all of these.">
+              <div className="grid grid-cols-2 gap-1.5">
+                {UAE_JOBS.map((j) => {
+                  const checked = f.preferred_jobs.includes(j);
+                  return (
+                    <label key={j} className={`flex items-center gap-2 px-3 py-2 rounded-md border text-sm cursor-pointer ${checked ? "border-primary bg-primary/10" : "border-input hover:bg-muted/50"}`}>
+                      <input type="checkbox" checked={checked} onChange={(e)=>{
+                        const next = e.target.checked
+                          ? [...f.preferred_jobs, j]
+                          : f.preferred_jobs.filter((x)=>x!==j);
+                        upd("preferred_jobs", next);
+                      }} className="accent-primary"/>
+                      {j}
+                    </label>
+                  );
+                })}
+              </div>
+            </Field>
             <Field label="Salary Expectation (UGX/month) *">
               <Input type="number" inputMode="numeric" value={f.salary_expectation_ugx} onChange={(e)=>upd("salary_expectation_ugx",e.target.value)} placeholder="e.g. 1500000"/>
+            </Field>
+            <Field label="Why do you want to work abroad? *" hint="In your own words — recruiters read this.">
+              <Textarea rows={4} value={f.reason_for_abroad} onChange={(e)=>upd("reason_for_abroad", e.target.value)} placeholder="e.g. I want to support my family, gain international experience…"/>
             </Field>
           </div>
         )}

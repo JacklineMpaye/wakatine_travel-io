@@ -342,14 +342,35 @@ function MyApplication() {
 
         {step === 3 && (
           <div className="space-y-4">
-            <Field label="Desired Job in UAE *">
+            <Field label="Primary desired job *" hint="The single job role you most want to do.">
               <select className="h-10 px-3 rounded-md border border-input bg-background w-full" value={f.desired_job} onChange={(e)=>upd("desired_job",e.target.value)}>
                 <option value="">Select a job…</option>
                 {UAE_JOBS.map((j)=><option key={j} value={j}>{j}</option>)}
               </select>
             </Field>
+            <Field label="Other preferred jobs *" hint="Tick every role you'd accept. Recruiters will see all of these.">
+              <div className="grid grid-cols-2 gap-1.5">
+                {UAE_JOBS.map((j) => {
+                  const checked = f.preferred_jobs.includes(j);
+                  return (
+                    <label key={j} className={`flex items-center gap-2 px-3 py-2 rounded-md border text-sm cursor-pointer ${checked ? "border-primary bg-primary/10" : "border-input hover:bg-muted/50"}`}>
+                      <input type="checkbox" checked={checked} onChange={(e)=>{
+                        const next = e.target.checked
+                          ? [...f.preferred_jobs, j]
+                          : f.preferred_jobs.filter((x)=>x!==j);
+                        upd("preferred_jobs", next);
+                      }} className="accent-primary"/>
+                      {j}
+                    </label>
+                  );
+                })}
+              </div>
+            </Field>
             <Field label="Salary Expectation (UGX/month) *">
               <Input type="number" inputMode="numeric" value={f.salary_expectation_ugx} onChange={(e)=>upd("salary_expectation_ugx",e.target.value)} placeholder="e.g. 1500000"/>
+            </Field>
+            <Field label="Why do you want to work abroad? *" hint="In your own words — recruiters read this.">
+              <Textarea rows={4} value={f.reason_for_abroad} onChange={(e)=>upd("reason_for_abroad", e.target.value)} placeholder="e.g. I want to support my family, gain international experience…"/>
             </Field>
           </div>
         )}

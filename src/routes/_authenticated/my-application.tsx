@@ -9,7 +9,8 @@ import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { ChevronLeft, ChevronRight, CheckCircle2, AlertTriangle, Upload, Circle, Clock, Pencil } from "lucide-react";
+import { ChevronLeft, ChevronRight, CheckCircle2, AlertTriangle, Upload, Circle, Clock, Pencil, Briefcase } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 
 export const Route = createFileRoute("/_authenticated/my-application")({ component: MyApplication });
 
@@ -24,9 +25,9 @@ const STAGE_LABEL: Record<string,string> = {
 };
 
 const UAE_JOBS = [
-  "Cleaner","Security Guard","Driver","House Maid","Hotel Attendant","Waiter/Waitress",
-  "Kitchen Helper","Chef Assistant","Laundry Attendant","Construction Worker","Caregiver",
-  "Barber","Salon Worker","Packing Worker","Office Cleaner",
+  "Driver","Cleaner","House Maid","Security Guard","Hotel Attendant","Caregiver",
+  "Waiter/Waitress","Kitchen Helper","Chef Assistant","Laundry Attendant",
+  "Construction Worker","Barber","Salon Worker","Packing Worker","Office Cleaner",
 ];
 
 const NIN_ISSUES = [
@@ -46,7 +47,8 @@ type Form = {
   father_status: string; mother_status: string;
   next_of_kin_name: string; next_of_kin_phone: string; next_of_kin_relationship: string;
   has_passport: "" | "yes" | "no"; passport_number: string;
-  desired_job: string; salary_expectation_ugx: string; nin_issue: string;
+  desired_job: string; preferred_jobs: string[]; reason_for_abroad: string;
+  salary_expectation_ugx: string; nin_issue: string;
 };
 
 const STEPS = ["Personal", "Family", "Documents", "Job", "Review"];
@@ -58,7 +60,7 @@ function MyApplication() {
   const [savedId, setSavedId] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [editing, setEditing] = useState(false);
-  const [tracker, setTracker] = useState<{ status: string; admin_notes: string | null } | null>(null);
+  const [tracker, setTracker] = useState<any | null>(null);
   const [passportFile, setPassportFile] = useState<File | null>(null);
   const [f, setF] = useState<Form>({
     full_name: "", date_of_birth: "", gender: "", phone: "", email: user?.email ?? "",
@@ -66,7 +68,8 @@ function MyApplication() {
     father_status: "", mother_status: "",
     next_of_kin_name: "", next_of_kin_phone: "", next_of_kin_relationship: "",
     has_passport: "", passport_number: "",
-    desired_job: "", salary_expectation_ugx: "", nin_issue: "no_issues",
+    desired_job: "", preferred_jobs: [], reason_for_abroad: "",
+    salary_expectation_ugx: "", nin_issue: "no_issues",
   });
 
   // Load existing draft
@@ -87,16 +90,19 @@ function MyApplication() {
           next_of_kin_relationship: data.next_of_kin_relationship ?? "",
           has_passport: data.has_passport === null ? "" : data.has_passport ? "yes" : "no",
           passport_number: data.passport_number ?? "",
-          desired_job: data.desired_job ?? "", salary_expectation_ugx: data.salary_expectation_ugx?.toString() ?? "",
+          desired_job: data.desired_job ?? "",
+          preferred_jobs: (data as any).preferred_jobs ?? [],
+          reason_for_abroad: (data as any).reason_for_abroad ?? "",
+          salary_expectation_ugx: data.salary_expectation_ugx?.toString() ?? "",
           nin_issue: data.nin_issue ?? "no_issues",
         }));
       }
-      const { data: app } = await supabase.from("applications").select("status, admin_notes").eq("applicant_id", user.id).order("created_at", { ascending: false }).limit(1).maybeSingle();
-      if (app) setTracker({ status: app.status as string, admin_notes: (app.admin_notes as string | null) ?? null });
+      const { data: app } = await supabase.from("applications").select("*, jobs(title, country, employer)").eq("applicant_id", user.id).order("created_at", { ascending: false }).limit(1).maybeSingle();
+      if (app) setTracker(app);
     })();
   }, [user]);
 
-  const upd = (k: keyof Form, v: string) => setF({ ...f, [k]: v });
+  const upd = (k: keyof Form, v: any) => setF({ ...f, [k]: v });
 
   const save = async (markSubmitted = false): Promise<string | null> => {
     if (!user) return null;
@@ -111,11 +117,13 @@ function MyApplication() {
       has_passport: f.has_passport === "" ? null : f.has_passport === "yes",
       passport_number: f.has_passport === "yes" ? f.passport_number || null : null,
       desired_job: f.desired_job || null,
+      preferred_jobs: f.preferred_jobs ?? [],
+      reason_for_abroad: f.reason_for_abroad || null,
       salary_expectation_ugx: f.salary_expectation_ugx ? Number(f.salary_expectation_ugx) : null,
       nin_issue: f.nin_issue || "no_issues",
       submitted: markSubmitted || undefined,
     };
-    const { data, error } = await supabase.from("application_details").upsert(payload, { onConflict: "user_id" }).select().single();
+    const { data, error } = await supabase.from("application_details").upsert(payload as any, { onConflict: "user_id" }).select().single();
     if (error) { toast.error(error.message); return null; }
     setSavedId(data.id);
     return data.id;

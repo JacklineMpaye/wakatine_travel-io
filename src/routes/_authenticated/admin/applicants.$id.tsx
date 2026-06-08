@@ -239,59 +239,138 @@ function Field({ label, value }: { label: string; value: any }) {
   );
 }
 
-function ApplicationControls({ app, jobs, onChange }: { app: any; jobs: any[]; onChange: () => void }) {
+function StatusControls({ app, onChange }: { app: any; onChange: () => void }) {
   const [status, setStatus] = useState(app.status);
-  const [jobId, setJobId] = useState(app.job_id ?? "");
-  const [customTitle, setCustomTitle] = useState(app.assigned_job_title ?? "");
-  const [customCountry, setCustomCountry] = useState(app.assigned_job_country ?? "");
-  const [customDesc, setCustomDesc] = useState(app.assigned_job_description ?? "");
-
   const saveStatus = async () => {
     const { error } = await supabase.from("applications").update({ status: status as any }).eq("id", app.id);
     if (error) return toast.error(error.message);
     toast.success("Status updated — applicant notified"); onChange();
   };
-  const saveJob = async () => {
+  return (
+    <div className="flex flex-wrap gap-2 items-end">
+      <div className="flex-1 min-w-[220px]">
+        <Label>Status</Label>
+        <select className="h-10 px-3 rounded-md border border-input bg-background w-full" value={status} onChange={(e)=>setStatus(e.target.value)}>
+          {STATUSES.map((s) => <option key={s} value={s}>{STATUS_LABEL[s]}</option>)}
+        </select>
+      </div>
+      <Button onClick={saveStatus}><Save className="w-4 h-4 mr-1"/>Update status</Button>
+    </div>
+  );
+}
+
+function JobAssignment({ app, jobs, onChange }: { app: any; jobs: any[]; onChange: () => void }) {
+  const [jobId, setJobId] = useState(app.job_id ?? "");
+  const [title, setTitle] = useState(app.assigned_job_title ?? "");
+  const [country, setCountry] = useState(app.assigned_job_country ?? "");
+  const [employer, setEmployer] = useState(app.assigned_job_employer ?? "");
+  const [salary, setSalary] = useState(app.assigned_job_salary ?? "");
+  const [benefits, setBenefits] = useState(app.assigned_job_benefits ?? "");
+  const [contract, setContract] = useState(app.assigned_job_contract_duration ?? "");
+  const [desc, setDesc] = useState(app.assigned_job_description ?? "");
+  const [jdFile, setJdFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+
+  // Prefill from selected catalogue job
+  const onPickJob = (id: string) => {
+    setJobId(id);
+    const j = jobs.find((x) => x.id === id);
+    if (j) {
+      if (!title) setTitle(j.title ?? "");
+      if (!country) setCountry(j.country ?? "");
+      if (!employer) setEmployer(j.employer ?? "");
+    }
+  };
+
+  const save = async () => {
+    setUploading(true);
+    let jdPath = app.assigned_job_description_path ?? null;
+    if (jdFile) {
+      const path = `${app.applicant_id}/job-description-${Date.now()}-${jdFile.name}`;
+      const { error: upErr } = await supabase.storage.from("applicant-documents").upload(path, jdFile, { upsert: true });
+      if (upErr) { setUploading(false); return toast.error(upErr.message); }
+      jdPath = path;
+    }
     const payload: any = {
-      job_id: jobId || app.job_id,
-      assigned_job_title: customTitle || null,
-      assigned_job_country: customCountry || null,
-      assigned_job_description: customDesc || null,
+      job_id: jobId || null,
+      assigned_job_title: title || null,
+      assigned_job_country: country || null,
+      assigned_job_employer: employer || null,
+      assigned_job_salary: salary || null,
+      assigned_job_benefits: benefits || null,
+      assigned_job_contract_duration: contract || null,
+      assigned_job_description: desc || null,
+      assigned_job_description_path: jdPath,
     };
     const { error } = await supabase.from("applications").update(payload).eq("id", app.id);
+    setUploading(false);
     if (error) return toast.error(error.message);
-    toast.success("Job assignment saved"); onChange();
+    setJdFile(null);
+    toast.success("Assignment saved — visible on applicant dashboard");
+    onChange();
   };
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap gap-2 items-end">
-        <div className="flex-1 min-w-[220px]">
-          <Label>Status</Label>
-          <select className="h-10 px-3 rounded-md border border-input bg-background w-full" value={status} onChange={(e)=>setStatus(e.target.value)}>
-            {STATUSES.map((s) => <option key={s} value={s}>{STATUS_LABEL[s]}</option>)}
-          </select>
-        </div>
-        <Button onClick={saveStatus}><Save className="w-4 h-4 mr-1"/>Update status</Button>
+      <div>
+        <Label>Pick from job catalogue</Label>
+        <select className="h-10 px-3 rounded-md border border-input bg-background w-full" value={jobId} onChange={(e)=>onPickJob(e.target.value)}>
+          <option value="">— None / custom assignment —</option>
+          {jobs.map((j: any) => <option key={j.id} value={j.id}>{j.title} · {j.country}{j.employer ? ` · ${j.employer}` : ""}</option>)}
+        </select>
+        <p className="text-xs text-muted-foreground mt-1">Picking a job auto-fills the fields below — you can still override them.</p>
       </div>
-      <div className="border-t border-border pt-4">
-        <div className="flex items-center gap-2 mb-2"><Briefcase className="w-4 h-4 text-primary"/><span className="font-semibold text-sm">Assigned job</span></div>
-        <div className="grid sm:grid-cols-2 gap-3">
-          <div>
-            <Label>Select from catalogue</Label>
-            <select className="h-10 px-3 rounded-md border border-input bg-background w-full" value={jobId} onChange={(e)=>setJobId(e.target.value)}>
-              <option value="">— None —</option>
-              {jobs.map((j: any) => <option key={j.id} value={j.id}>{j.title} · {j.country}</option>)}
-            </select>
-          </div>
+      <div className="grid sm:grid-cols-2 gap-3">
+        <div><Label>Job title *</Label><Input value={title} onChange={(e)=>setTitle(e.target.value)} placeholder="e.g. Hotel Cleaner"/></div>
+        <div><Label>Country *</Label><Input value={country} onChange={(e)=>setCountry(e.target.value)} placeholder="e.g. UAE"/></div>
+        <div><Label>Employer</Label><Input value={employer} onChange={(e)=>setEmployer(e.target.value)} placeholder="e.g. Al Habtoor Hotels"/></div>
+        <div><Label>Salary</Label><Input value={salary} onChange={(e)=>setSalary(e.target.value)} placeholder="e.g. AED 1,500/month + tips"/></div>
+        <div><Label>Contract duration</Label><Input value={contract} onChange={(e)=>setContract(e.target.value)} placeholder="e.g. 2 years renewable"/></div>
+        <div><Label>Benefits</Label><Input value={benefits} onChange={(e)=>setBenefits(e.target.value)} placeholder="Food, accommodation, transport, medical…"/></div>
+        <div className="sm:col-span-2"><Label>Job description</Label><Textarea rows={5} value={desc} onChange={(e)=>setDesc(e.target.value)} placeholder="Paste or type the full job description (will be included in the exported report)…"/></div>
+        <div className="sm:col-span-2">
+          <Label>Or upload a job-description document</Label>
+          <label className="flex items-center gap-3 p-3 border border-dashed border-input rounded-lg cursor-pointer hover:bg-muted/40">
+            <Upload className="w-5 h-5 text-primary"/>
+            <span className="text-sm">{jdFile ? jdFile.name : app.assigned_job_description_path ? `Current: ${(app.assigned_job_description_path as string).split("/").pop()}` : "Tap to choose a PDF/DOCX/image"}</span>
+            <input type="file" accept=".pdf,.doc,.docx,image/*" className="hidden" onChange={(e)=>setJdFile(e.target.files?.[0] ?? null)}/>
+          </label>
         </div>
-        <div className="text-xs text-muted-foreground my-2">— or override with a custom assignment —</div>
-        <div className="grid sm:grid-cols-2 gap-3">
-          <div><Label>Custom title</Label><Input value={customTitle} onChange={(e)=>setCustomTitle(e.target.value)} placeholder="e.g. Hotel Cleaner"/></div>
-          <div><Label>Country</Label><Input value={customCountry} onChange={(e)=>setCustomCountry(e.target.value)} placeholder="e.g. UAE"/></div>
-          <div className="sm:col-span-2"><Label>Job description</Label><Textarea rows={4} value={customDesc} onChange={(e)=>setCustomDesc(e.target.value)} placeholder="Paste or type the job description that will appear on the exported report…"/></div>
+      </div>
+      <Button onClick={save} disabled={uploading}><Save className="w-4 h-4 mr-1"/>{uploading ? "Saving…" : "Save assignment"}</Button>
+    </div>
+  );
+}
+
+function ExportReportInline({ data }: { data: any }) {
+  const [type, setType] = useState<"biodata"|"full">("biodata");
+  const [jobDescOverride, setJobDescOverride] = useState("");
+  const generate = (print: boolean) => {
+    const html = buildReportHtml(data, type, jobDescOverride);
+    const w = window.open("", "_blank");
+    if (!w) return;
+    w.document.write(html); w.document.close();
+    if (print) setTimeout(() => w.print(), 400);
+  };
+  return (
+    <div className="space-y-3 max-w-2xl">
+      <div>
+        <Label>Report type</Label>
+        <div className="grid grid-cols-2 gap-2 mt-1">
+          <Button type="button" variant={type==="biodata"?"default":"outline"} size="sm" onClick={()=>setType("biodata")}>Biodata Summary</Button>
+          <Button type="button" variant={type==="full"?"default":"outline"} size="sm" onClick={()=>setType("full")}>Full Application</Button>
         </div>
-        <Button className="mt-3" onClick={saveJob}><Save className="w-4 h-4 mr-1"/>Save assignment</Button>
+        <p className="text-xs text-muted-foreground mt-1">
+          {type === "biodata" ? "Personal & contact details, preferred jobs, assigned job, current status." : "Entire registration form: personal, family, education, employment, preferred jobs, assigned job, status."}
+        </p>
+      </div>
+      <div>
+        <Label>Extra job description (optional override)</Label>
+        <Textarea rows={4} value={jobDescOverride} onChange={(e)=>setJobDescOverride(e.target.value)} placeholder="Leave blank to use the saved assigned-job description."/>
+      </div>
+      <div className="flex gap-2">
+        <Button className="flex-1" onClick={()=>generate(false)}><FileText className="w-4 h-4 mr-1"/>Preview</Button>
+        <Button className="flex-1 bg-gradient-primary" onClick={()=>generate(true)}><Printer className="w-4 h-4 mr-1"/>Print / PDF</Button>
       </div>
     </div>
   );

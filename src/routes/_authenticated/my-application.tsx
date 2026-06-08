@@ -245,9 +245,27 @@ function MyApplication() {
           <Review label="District / Village" v={`${f.district}${f.village ? ` · ${f.village}` : ""}`}/>
           <Review label="Next of Kin" v={`${f.next_of_kin_name} (${f.next_of_kin_relationship}) — ${f.next_of_kin_phone}`}/>
           <Review label="Passport" v={f.has_passport === "yes" ? `Yes — ${f.passport_number}` : "No (processing required)"}/>
-          <Review label="Desired Job" v={f.desired_job}/>
+          <Review label="Primary desired job" v={f.desired_job}/>
+          <Review label="Other preferred jobs" v={f.preferred_jobs?.join(", ") || "—"}/>
           <Review label="Salary expectation" v={f.salary_expectation_ugx ? `UGX ${Number(f.salary_expectation_ugx).toLocaleString()}` : "—"}/>
+          <Review label="Why work abroad" v={f.reason_for_abroad || "—"}/>
         </Card>
+        {tracker && (tracker.assigned_job_title || tracker.jobs?.title) && (
+          <Card className="p-6 border-primary/30">
+            <div className="flex items-center gap-2 mb-3"><Briefcase className="w-5 h-5 text-primary"/><h2 className="font-bold text-lg">Job assigned by Wakatine</h2></div>
+            <div className="grid sm:grid-cols-2 gap-3 text-sm">
+              <Review label="Job title" v={tracker.assigned_job_title || tracker.jobs?.title || "—"}/>
+              <Review label="Country" v={tracker.assigned_job_country || tracker.jobs?.country || "—"}/>
+              <Review label="Employer" v={tracker.assigned_job_employer || tracker.jobs?.employer || "—"}/>
+              <Review label="Salary" v={tracker.assigned_job_salary || "—"}/>
+              <Review label="Contract" v={tracker.assigned_job_contract_duration || "—"}/>
+              <Review label="Benefits" v={tracker.assigned_job_benefits || "—"}/>
+            </div>
+            {tracker.assigned_job_description && (
+              <div className="mt-3 p-3 bg-muted/50 rounded-lg text-sm whitespace-pre-wrap"><b>Description:</b> {tracker.assigned_job_description}</div>
+            )}
+          </Card>
+        )}
       </div>
     );
   }

@@ -1,5 +1,5 @@
 {
   "installCommand": "bun install",
-  "buildCommand": "bun run build",
+  "buildCommand": "NITRO_PRESET=vercel-edge bun run build",
   "framework": null
 }

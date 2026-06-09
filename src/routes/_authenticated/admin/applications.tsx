@@ -21,7 +21,21 @@ function AdminApplications() {
   const [filter, setFilter] = useState("all");
   const { data: apps = [] } = useQuery({
     queryKey: ["admin-apps-page"],
-    queryFn: async () => (await supabase.from("applications").select("*, jobs(title, country), profiles(full_name, email, phone)").order("created_at", { ascending: false })).data ?? [],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("applications")
+        .select("*, jobs(title, country), profiles(full_name, email, phone, applicant_code)")
+        .order("created_at", { ascending: false });
+      const apps = data ?? [];
+      const ids = apps.map((a: any) => a.applicant_id).filter(Boolean);
+      if (ids.length) {
+        const { data: details } = await supabase
+          .from("application_details").select("user_id, preferred_jobs, salary_expectation_ugx, desired_job").in("user_id", ids);
+        const map = new Map((details ?? []).map((d: any) => [d.user_id, d]));
+        apps.forEach((a: any) => { a.details = map.get(a.applicant_id); });
+      }
+      return apps;
+    },
   });
   const updateStatus = async (id: string, status: string) => {
     const { error } = await supabase.from("applications").update({ status: status as any }).eq("id", id);

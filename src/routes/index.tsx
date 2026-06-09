@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { PublicLayout } from "@/components/site/PublicLayout";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Plane, ShieldCheck, Users, CheckCircle2, ArrowRight, Star, MessageCircle } from "lucide-react";
+import { Plane, ShieldCheck, Users, CheckCircle2, ArrowRight } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -94,26 +94,6 @@ function Index() {
         </div>
       </section>
 
-      {/* TESTIMONIALS */}
-      <section className="container mx-auto px-4 py-20">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Real Ugandans. Real placements.</h2>
-        <div className="grid md:grid-cols-3 gap-6">
-          {[
-            { n: "Sarah N.", r: "Caregiver in UK", q: "PearlBridge handled everything — from my CV polish to my flight. I'm now sending money home every month." },
-            { n: "James O.", r: "Security in UAE", q: "Within 4 months of registering I was in Dubai. The status tracker kept me informed every step." },
-            { n: "Aisha K.", r: "Nurse in Saudi Arabia", q: "Professional, transparent fees, and they truly care. Highly recommend." },
-          ].map((t) => (
-            <Card key={t.n} className="p-6 glass">
-              <div className="flex mb-3">{[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-warning text-warning" />)}</div>
-              <p className="text-foreground/90 mb-4 italic">"{t.q}"</p>
-              <div>
-                <div className="font-semibold">{t.n}</div>
-                <div className="text-sm text-muted-foreground">{t.r}</div>
-              </div>
-            </Card>
-          ))}
-        </div>
-      </section>
 
       {/* CTA */}
       <section className="container mx-auto px-4 pb-20">

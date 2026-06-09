@@ -3,12 +3,12 @@ import { PublicLayout } from "@/components/site/PublicLayout";
 import { Card } from "@/components/ui/card";
 import { Star } from "lucide-react";
 const stories = [
-  { n: "Sarah Namutebi", r: "Caregiver, Manchester UK", q: "Within 6 months I was working in the UK. The team supported me through visa interviews." },
-  { n: "James Okello", r: "Security, Dubai UAE", q: "I came from Gulu with nothing but ambition. Today I send school fees home every month." },
-  { n: "Aisha Kabugo", r: "Nurse, Riyadh KSA", q: "Professional, honest, very supportive. Contract renewing for a 3rd year." },
-  { n: "Peter Ssebuliba", r: "Truck Driver, Toronto", q: "From Kampala to Canada in 9 months. The status tracker was a lifesaver." },
-  { n: "Mariam Nakato", r: "Hospitality, Doha", q: "Best decision I ever made. PearlBridge is genuine." },
-  { n: "David Mugisha", r: "Farm Worker, Texas USA", q: "Seasonal H-2A program. I'm going back next season." },
+  { n: "James Okello", r: "Security Guard, Dubai UAE", q: "I came from Gulu with nothing but ambition. Today I send school fees home every month." },
+  { n: "Grace Nabirye", r: "Housemaid, Abu Dhabi UAE", q: "Wakatine handled everything — visa, medical, flight. I arrived safe and started work within days." },
+  { n: "Brian Tumwine", r: "Driver, Sharjah UAE", q: "Professional and honest. My contract is for 2 years and they even helped me open a bank account." },
+  { n: "Fatuma Nalwoga", r: "Hotel Attendant, Dubai UAE", q: "I was nervous about going abroad alone but the team checked on me every week. Truly grateful." },
+  { n: "Ronald Kizza", r: "Kitchen Helper, Abu Dhabi UAE", q: "From application to deployment in 3 months. Everything was transparent — no hidden fees." },
+  { n: "Prossy Nakamatte", r: "Caregiver, Dubai UAE", q: "My employer is kind and my salary comes on time. Wakatine matched me perfectly." },
 ];
 export const Route = createFileRoute("/testimonials")({
   head: () => ({ meta: [{ title: "Success Stories — PearlBridge" }, { name: "description", content: "Real Ugandans now working abroad." }] }),

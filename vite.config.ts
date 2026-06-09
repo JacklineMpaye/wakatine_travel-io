@@ -12,5 +12,5 @@ export default defineConfig({
   },
   // Force Nitro to produce .vercel/output (Vercel Build Output API format).
   // "preset" takes precedence over the library's defaultPreset:"cloudflare-module".
-  nitro: { preset: "vercel-edge" },
+  nitro: { preset: "vercel" },
 });

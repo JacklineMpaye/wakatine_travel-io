@@ -188,6 +188,18 @@ function MyApplication() {
     }
     if (fees.length) await supabase.from("payments").insert(fees);
 
+    // Ensure an `applications` row exists so admins can manage status/assignment.
+    const { data: existingApp } = await supabase
+      .from("applications").select("id").eq("applicant_id", user.id).limit(1).maybeSingle();
+    if (!existingApp) {
+      await supabase.from("applications").insert({
+        applicant_id: user.id,
+        status: "registration_submitted" as any,
+      } as any);
+    } else {
+      await supabase.from("applications").update({ status: "registration_submitted" as any }).eq("id", existingApp.id);
+    }
+
     // Notification
     await supabase.from("notifications").insert({
       user_id: user.id,

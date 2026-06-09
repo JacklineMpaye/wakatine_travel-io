@@ -21,7 +21,21 @@ function AdminApplications() {
   const [filter, setFilter] = useState("all");
   const { data: apps = [] } = useQuery({
     queryKey: ["admin-apps-page"],
-    queryFn: async () => (await supabase.from("applications").select("*, jobs(title, country), profiles(full_name, email, phone)").order("created_at", { ascending: false })).data ?? [],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("applications")
+        .select("*, jobs(title, country), profiles(full_name, email, phone, applicant_code)")
+        .order("created_at", { ascending: false });
+      const apps = data ?? [];
+      const ids = apps.map((a: any) => a.applicant_id).filter(Boolean);
+      if (ids.length) {
+        const { data: details } = await supabase
+          .from("application_details").select("user_id, preferred_jobs, salary_expectation_ugx, desired_job").in("user_id", ids);
+        const map = new Map((details ?? []).map((d: any) => [d.user_id, d]));
+        apps.forEach((a: any) => { a.details = map.get(a.applicant_id); });
+      }
+      return apps;
+    },
   });
   const updateStatus = async (id: string, status: string) => {
     const { error } = await supabase.from("applications").update({ status: status as any }).eq("id", id);
@@ -64,8 +78,20 @@ function ApplicationCard({ a, onStatus, onNotes }: { a: any; onStatus: (id: stri
     <Card className="p-4 space-y-3">
       <div className="flex justify-between flex-wrap gap-3">
         <div>
-          <div className="font-semibold">{a.profiles?.full_name ?? a.profiles?.email}</div>
-          <div className="text-sm text-muted-foreground">{a.jobs?.title} · {a.jobs?.country} · {a.profiles?.phone}</div>
+          <div className="font-semibold flex items-center gap-2">
+            {a.profiles?.applicant_code && <span className="text-primary text-xs font-mono bg-primary/10 px-2 py-0.5 rounded">{a.profiles.applicant_code}</span>}
+            {a.profiles?.full_name ?? a.profiles?.email ?? "(no name)"}
+          </div>
+          <div className="text-sm text-muted-foreground">{a.profiles?.phone ?? "—"} · Submitted {new Date(a.created_at).toLocaleDateString()}</div>
+          {a.details?.preferred_jobs?.length > 0 && (
+            <div className="text-xs text-muted-foreground mt-1">Preferred: {a.details.preferred_jobs.join(", ")}{a.details.salary_expectation_ugx ? ` · Expect UGX ${Number(a.details.salary_expectation_ugx).toLocaleString()}` : ""}</div>
+          )}
+          {a.assigned_job_title && (
+            <div className="text-xs text-primary mt-1">Assigned: {a.assigned_job_title}{a.assigned_job_country ? ` · ${a.assigned_job_country}` : ""}{a.assigned_job_employer ? ` · ${a.assigned_job_employer}` : ""}</div>
+          )}
+          {a.jobs?.title && !a.assigned_job_title && (
+            <div className="text-xs text-primary mt-1">Job: {a.jobs.title} · {a.jobs.country}</div>
+          )}
         </div>
         <Badge>{a.status}</Badge>
       </div>
@@ -73,6 +99,7 @@ function ApplicationCard({ a, onStatus, onNotes }: { a: any; onStatus: (id: stri
         <select className="h-9 px-3 rounded-md border border-input bg-background text-sm" defaultValue={a.status} onChange={(e)=>onStatus(a.id, e.target.value)}>
           {STATUSES.map((s) => <option key={s} value={s}>{s.replace(/_/g," ")}</option>)}
         </select>
+        <a href={`/admin/applicants/${a.applicant_id}`} className="text-xs text-primary underline">Open case file →</a>
       </div>
       <div className="space-y-2">
         <Textarea rows={2} placeholder="Admin notes…" value={notes} onChange={(e)=>setNotes(e.target.value)}/>

@@ -154,7 +154,7 @@ export type Database = {
           cover_letter: string | null
           created_at: string
           id: string
-          job_id: string
+          job_id: string | null
           status: Database["public"]["Enums"]["application_status"]
           updated_at: string
         }
@@ -172,7 +172,7 @@ export type Database = {
           cover_letter?: string | null
           created_at?: string
           id?: string
-          job_id: string
+          job_id?: string | null
           status?: Database["public"]["Enums"]["application_status"]
           updated_at?: string
         }
@@ -190,7 +190,7 @@ export type Database = {
           cover_letter?: string | null
           created_at?: string
           id?: string
-          job_id?: string
+          job_id?: string | null
           status?: Database["public"]["Enums"]["application_status"]
           updated_at?: string
         }

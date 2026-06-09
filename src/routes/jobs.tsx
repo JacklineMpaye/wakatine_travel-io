@@ -11,7 +11,7 @@ import { Briefcase, MapPin, Calendar, DollarSign, Search } from "lucide-react";
 import { COUNTRIES } from "@/lib/countries";
 
 export const Route = createFileRoute("/jobs")({
-  head: () => ({ meta: [{ title: "Jobs Abroad — PearlBridge" }, { name: "description", content: "Verified overseas jobs for Ugandans." }] }),
+  head: () => ({ meta: [{ title: "Jobs Abroad — Wakatine" }, { name: "description", content: "Verified overseas jobs for Ugandans." }] }),
   component: JobsPage,
 });
 

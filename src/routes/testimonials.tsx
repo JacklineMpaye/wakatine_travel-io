@@ -11,7 +11,7 @@ const stories = [
   { n: "Prossy Nakamatte", r: "Caregiver, Dubai UAE", q: "My employer is kind and my salary comes on time. Wakatine matched me perfectly." },
 ];
 export const Route = createFileRoute("/testimonials")({
-  head: () => ({ meta: [{ title: "Success Stories — PearlBridge" }, { name: "description", content: "Real Ugandans now working abroad." }] }),
+  head: () => ({ meta: [{ title: "Success Stories — Wakatine" }, { name: "description", content: "Real Ugandans now working abroad." }] }),
   component: () => (
     <PublicLayout>
       <section className="bg-gradient-hero text-white py-16"><div className="container mx-auto px-4"><h1 className="text-4xl md:text-5xl font-bold mb-3">Success Stories</h1><p className="text-white/85">Ugandans whose lives changed when they took the leap.</p></div></section>

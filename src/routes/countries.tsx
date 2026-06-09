@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { COUNTRIES } from "@/lib/countries";
 
 export const Route = createFileRoute("/countries")({
-  head: () => ({ meta: [{ title: "Countries — PearlBridge" }, { name: "description", content: "Countries we place Ugandan workers in." }] }),
+  head: () => ({ meta: [{ title: "Countries — Wakatine" }, { name: "description", content: "Countries we place Ugandan workers in." }] }),
   component: () => (
     <PublicLayout>
       <section className="bg-gradient-hero text-white py-16"><div className="container mx-auto px-4"><h1 className="text-4xl md:text-5xl font-bold mb-3">Countries We Place Workers In</h1><p className="text-white/85">Vetted employers across 6 high-demand destinations.</p></div></section>

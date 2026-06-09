@@ -6,7 +6,7 @@ import { ShieldCheck, Globe, Heart, Award } from "lucide-react";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About Us — PearlBridge Recruitment" },
+      { title: "About Us — Wakatine Tours & Travel" },
       { name: "description", content: "Licensed Ugandan overseas recruitment agency with a decade of experience placing workers in the Gulf, UK, Canada and USA." },
     ],
   }),
@@ -18,7 +18,7 @@ function About() {
     <PublicLayout>
       <section className="bg-gradient-hero text-white py-20">
         <div className="container mx-auto px-4">
-          <h1 className="text-4xl md:text-6xl font-bold mb-4">About PearlBridge</h1>
+          <h1 className="text-4xl md:text-6xl font-bold mb-4">About Wakatine</h1>
           <p className="text-xl text-white/85 max-w-2xl">A licensed Ugandan agency built to make overseas employment safe, transparent, and life-changing.</p>
         </div>
       </section>

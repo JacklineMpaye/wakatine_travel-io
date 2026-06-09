@@ -74,10 +74,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "PearlBridge — Jobs Abroad for Ugandans" },
+      { title: "Wakatine — Jobs Abroad for Ugandans" },
       { name: "description", content: "Licensed overseas recruitment agency helping Ugandans get jobs in the UAE, Qatar, Saudi Arabia, UK, Canada and USA." },
-      { name: "author", content: "PearlBridge Recruitment" },
-      { property: "og:title", content: "PearlBridge — Jobs Abroad for Ugandans" },
+      { name: "author", content: "Wakatine Tours & Travel" },
+      { property: "og:title", content: "Wakatine — Jobs Abroad for Ugandans" },
       { property: "og:description", content: "Trusted Ugandan recruitment agency. Apply for jobs in the Gulf, UK, Canada and USA." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

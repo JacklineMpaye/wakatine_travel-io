@@ -10,11 +10,30 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin/applications")({ component: AdminApplications });
 
+// Primary workflow first, then legacy/extended statuses
 const STATUSES = [
-  "draft","registration_submitted","under_review","approved","documents_pending","documents_verified",
-  "interview_scheduled","interview_passed","medical_check_pending","visa_processing","visa_approved",
-  "flight_scheduled","deployed_abroad","rejected",
+  "registration_submitted","under_review","medical_check_pending","documents_verified","approved","job_assigned",
+  "draft","documents_pending","interview_scheduled","interview_passed",
+  "visa_processing","visa_approved","flight_scheduled","deployed_abroad","rejected",
 ];
+
+const STATUS_LABEL: Record<string, string> = {
+  registration_submitted: "Submitted",
+  under_review:           "Under Review",
+  medical_check_pending:  "Medical Check Pending",
+  documents_verified:     "Documents Verified",
+  approved:               "Approved",
+  job_assigned:           "Job Assigned",
+  draft:                  "Draft",
+  documents_pending:      "Documents Pending",
+  interview_scheduled:    "Interview Scheduled",
+  interview_passed:       "Interview Passed",
+  visa_processing:        "Visa Processing",
+  visa_approved:          "Visa Approved",
+  flight_scheduled:       "Flight Scheduled",
+  deployed_abroad:        "Deployed Abroad",
+  rejected:               "Rejected",
+};
 
 function AdminApplications() {
   const qc = useQueryClient();
@@ -22,17 +41,24 @@ function AdminApplications() {
   const { data: apps = [] } = useQuery({
     queryKey: ["admin-apps-page"],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("applications")
-        .select("*, jobs(title, country), profiles(full_name, email, phone, applicant_code)")
+        .select("*, jobs(title, country)")
         .order("created_at", { ascending: false });
+      if (error) throw error;
       const apps = data ?? [];
       const ids = apps.map((a: any) => a.applicant_id).filter(Boolean);
       if (ids.length) {
-        const { data: details } = await supabase
-          .from("application_details").select("user_id, preferred_jobs, salary_expectation_ugx, desired_job").in("user_id", ids);
-        const map = new Map((details ?? []).map((d: any) => [d.user_id, d]));
-        apps.forEach((a: any) => { a.details = map.get(a.applicant_id); });
+        const [{ data: profiles }, { data: details }] = await Promise.all([
+          supabase.from("profiles").select("id, full_name, email, phone, applicant_code").in("id", ids),
+          supabase.from("application_details").select("user_id, preferred_jobs, salary_expectation_ugx, desired_job").in("user_id", ids),
+        ]);
+        const profileMap = new Map((profiles ?? []).map((p: any) => [p.id, p]));
+        const detailMap  = new Map((details  ?? []).map((d: any) => [d.user_id, d]));
+        apps.forEach((a: any) => {
+          a.profiles = profileMap.get(a.applicant_id);
+          a.details  = detailMap.get(a.applicant_id);
+        });
       }
       return apps;
     },
@@ -60,7 +86,7 @@ function AdminApplications() {
       <div className="flex gap-2 flex-wrap">
         <Button size="sm" variant={filter==="all"?"default":"outline"} onClick={()=>setFilter("all")}>All</Button>
         {STATUSES.map((s)=>(
-          <Button key={s} size="sm" variant={filter===s?"default":"outline"} onClick={()=>setFilter(s)}>{s.replace(/_/g," ")}</Button>
+          <Button key={s} size="sm" variant={filter===s?"default":"outline"} onClick={()=>setFilter(s)}>{STATUS_LABEL[s] ?? s.replace(/_/g," ")}</Button>
         ))}
       </div>
       <div className="space-y-3">
@@ -97,7 +123,7 @@ function ApplicationCard({ a, onStatus, onNotes }: { a: any; onStatus: (id: stri
       </div>
       <div className="flex flex-wrap gap-2 items-center">
         <select className="h-9 px-3 rounded-md border border-input bg-background text-sm" defaultValue={a.status} onChange={(e)=>onStatus(a.id, e.target.value)}>
-          {STATUSES.map((s) => <option key={s} value={s}>{s.replace(/_/g," ")}</option>)}
+          {STATUSES.map((s) => <option key={s} value={s}>{STATUS_LABEL[s] ?? s.replace(/_/g," ")}</option>)}
         </select>
         <a href={`/admin/applicants/${a.applicant_id}`} className="text-xs text-primary underline">Open case file →</a>
       </div>

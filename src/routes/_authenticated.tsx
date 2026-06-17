@@ -1,7 +1,7 @@
 import { createFileRoute, Outlet, Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
 import { useEffect } from "react";
-import { LayoutDashboard, FolderOpen, CreditCard, Bell, User, LogOut, Plane, ClipboardCheck } from "lucide-react";
+import { LayoutDashboard, FolderOpen, CreditCard, Bell, User, LogOut, Plane, ClipboardCheck, FileDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated")({ component: AuthLayout });
@@ -10,6 +10,7 @@ const navItems = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/my-application", label: "My Application", icon: ClipboardCheck },
   { to: "/documents", label: "Documents", icon: FolderOpen },
+  { to: "/forms", label: "Forms", icon: FileDown },
   { to: "/payments", label: "Payments", icon: CreditCard },
   { to: "/notifications", label: "Notifications", icon: Bell },
   { to: "/profile", label: "Profile", icon: User },
